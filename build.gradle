@@ -12,7 +12,7 @@ repositories {
 }
 
 apply plugin:'application'
-mainClassName = "core.Client"
+mainClassName = "example.demo.DemoApp"
 
 dependencies {
     compile group: 'io.netty', name: 'netty-all', version: '4.1.25.Final'
