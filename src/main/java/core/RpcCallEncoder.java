@@ -19,20 +19,33 @@ public class RpcCallEncoder extends MessageToMessageEncoder<RpcCall> {
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, final RpcCall msg, final List<Object> out) {
-        final long meta = msg.getMethodMeta();
-        final int sessionId = HARDCODED_SESSION_ID;
+
+        final byte[] body = msg.getBody();
+        final long length = body.length;
+
+        //make request
+        final long meta = 212494116 ^ 1719559449; //example method call
+        final int sessionId = 1;
         final byte compression = (byte) 0;
         final byte bitFlags = (byte) 0;
 
-        final long checkSum = MAX_UNSIGNED_INT & LongHashFunction.xx().hashBytes(msg.getBody());
+        final long maxUnsignedInt = MAX_UNSIGNED_INT;
+        final long checkSum = maxUnsignedInt & LongHashFunction.xx().hashBytes(body);
 
         final FlatBufferBuilder internalRequest = new FlatBufferBuilder(0);
-
-        final int length = msg.getBody().length;
         int headerPosition = Header.createHeader(internalRequest, compression, bitFlags, sessionId, length, checkSum, meta);
         internalRequest.finish(headerPosition);
+        byte[] bytes = internalRequest.sizedByteArray();
 
-        final ByteBuf byteBuf = ctx.alloc().buffer().writeBytes(internalRequest.dataBuffer());
+        byte[] dest = new byte[16];
+
+        //fixme - I cannot even comment on this (｡◕‿‿◕｡)
+        System.arraycopy(bytes, 4, dest, 0, 16 );
+
+        final ByteBuf byteBuf = ctx.alloc().heapBuffer()
+                .writeBytes(dest)
+                .writeBytes(body);
+
         out.add(byteBuf);
     }
 }

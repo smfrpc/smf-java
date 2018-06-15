@@ -13,13 +13,16 @@ public class DemoApp {
         final SmfStorageClient smfStorageClient = new SmfStorageClient(smfClient);
 
         //construct get request.
-        FlatBufferBuilder request = new FlatBufferBuilder(0);
-        int requestPosition = request.createString("GET /something/");
-        int root = demo.Request.createRequest(request, requestPosition);
-        request.finish(root);
+        FlatBufferBuilder requestBuilder = new FlatBufferBuilder(0);
+        int requestPosition = requestBuilder.createString("GET /something/");
 
-        //this can explode if buffer not backed by array will be used :D
-        byte[] body = request.dataBuffer().array();
+        demo.Request.startRequest(requestBuilder);
+        demo.Request.addName(requestBuilder, requestPosition);
+        int root = demo.Request.endRequest(requestBuilder);
+        requestBuilder.finish(root);
+
+        byte[] body = requestBuilder.sizedByteArray();
+
 
         //of course, this will be removed as well
         final CountDownLatch latch = new CountDownLatch(1);
