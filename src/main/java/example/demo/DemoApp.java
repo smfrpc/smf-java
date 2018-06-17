@@ -23,16 +23,40 @@ public class DemoApp {
 
         byte[] body = requestBuilder.sizedByteArray();
 
-
         //of course, this will be removed as well
         final CountDownLatch latch = new CountDownLatch(1);
 
         smfStorageClient.get(body, response -> {
-            int bytesToRead = response.readableBytes();
-            byte[] reposeBytes = new byte[bytesToRead];
-            response.readBytes(reposeBytes);
 
-            System.out.println("Got the response : " + new String(reposeBytes));
+            System.out.println("Received Response details =============================================");
+
+            System.out.println("compression : " + response.readByte());
+            System.out.println("bitflags : " + response.readByte());
+            System.out.println("session : " + response.readUnsignedShort());
+            System.out.println("size : " + response.readUnsignedShort());
+            System.out.println("checksum : " + response.readUnsignedInt());
+            System.out.println("meta : " + response.readUnsignedInt());
+
+            System.out.println();
+
+            int bytesToRead = response.readableBytes();
+            byte[] responseBytes = new byte[bytesToRead];
+            response.readBytes(responseBytes);
+
+            System.out.println("Response dump (hex) = = = = = = = = = = = = = = = = = = = = = = = = = =");
+
+            for(int i = 0; i < responseBytes.length; i++)
+            {
+                if(i % 10 == 0)
+                {
+                    System.out.println();
+                }
+
+                System.out.print(String.format("     %02X", responseBytes[i]));
+            }
+            System.out.println("\n= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
+            System.out.println("\n========================================================================");
+
 
             latch.countDown();
         });

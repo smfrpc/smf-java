@@ -20,6 +20,9 @@ public class SmfClient {
 
         dispatcher = new Dispatcher();
 
+        RpcCallEncoder rpcCallEncoder = new RpcCallEncoder();
+        RpcCallDecoder rpcCallDecoder = new RpcCallDecoder();
+
         bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
@@ -28,7 +31,8 @@ public class SmfClient {
                     @Override
                     protected void initChannel(final SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
-                        p.addLast(new RpcCallEncoder());
+                        p.addLast(rpcCallEncoder);
+//                        p.addLast(rpcCallDecoder);
                         p.addLast(dispatcher);
                     }
                 });

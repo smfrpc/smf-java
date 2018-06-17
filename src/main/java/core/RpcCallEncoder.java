@@ -32,7 +32,7 @@ public class RpcCallEncoder extends MessageToMessageEncoder<RpcCall> {
         final long maxUnsignedInt = MAX_UNSIGNED_INT;
         final long checkSum = maxUnsignedInt & LongHashFunction.xx().hashBytes(body);
 
-        final FlatBufferBuilder internalRequest = new FlatBufferBuilder(0);
+        final FlatBufferBuilder internalRequest = new FlatBufferBuilder(20);
         int headerPosition = Header.createHeader(internalRequest, compression, bitFlags, sessionId, length, checkSum, meta);
         internalRequest.finish(headerPosition);
         byte[] bytes = internalRequest.sizedByteArray();
