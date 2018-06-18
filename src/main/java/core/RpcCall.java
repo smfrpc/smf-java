@@ -1,18 +1,24 @@
 package core;
 
-import io.netty.buffer.ByteBuf;
 
+import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
 public class RpcCall {
+    private final int sessionId;
     private final long methodMeta;
     private final byte[] body;
-    private final Consumer<ByteBuf> callback;
+    private final Consumer<ByteBuffer> callback;
 
-    public RpcCall(long methodMeta, byte[] body, final Consumer<ByteBuf> callback) {
+    public RpcCall(final int sessionId, long methodMeta, byte[] body, final Consumer<ByteBuffer> callback) {
+        this.sessionId = sessionId;
         this.methodMeta = methodMeta;
         this.body = body;
         this.callback = callback;
+    }
+
+    public int getSessionId() {
+        return sessionId;
     }
 
     public long getMethodMeta() {
@@ -23,10 +29,11 @@ public class RpcCall {
         return body;
     }
 
-    public Consumer<ByteBuf> getCallback()
+    public Consumer<ByteBuffer> getCallback()
     {
         return callback;
     }
+
 
     //fixme equals hashcode toString
 }

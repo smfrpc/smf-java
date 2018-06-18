@@ -12,57 +12,48 @@ public class DemoApp {
 
         final SmfStorageClient smfStorageClient = new SmfStorageClient(smfClient);
 
-        //construct get request.
-        FlatBufferBuilder requestBuilder = new FlatBufferBuilder(0);
-        int requestPosition = requestBuilder.createString("GET /something/");
 
-        demo.Request.startRequest(requestBuilder);
-        demo.Request.addName(requestBuilder, requestPosition);
-        int root = demo.Request.endRequest(requestBuilder);
-        requestBuilder.finish(root);
+        //lets schedule 100 concurrent requests
+        final int concurrentConCount = 3;
+        final CountDownLatch endLatch = new CountDownLatch(concurrentConCount);
+        final CountDownLatch startLatch = new CountDownLatch(concurrentConCount);
 
-        byte[] body = requestBuilder.sizedByteArray();
+        for(int i = 0; i < concurrentConCount; i++)
+        {
+            new Thread(() -> {
 
-        //of course, this will be removed as well
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        smfStorageClient.get(body, response -> {
-
-            System.out.println("Received Response details =============================================");
-
-            System.out.println("compression : " + response.readByte());
-            System.out.println("bitflags : " + response.readByte());
-            System.out.println("session : " + response.readUnsignedShort());
-            System.out.println("size : " + response.readUnsignedShort());
-            System.out.println("checksum : " + response.readUnsignedInt());
-            System.out.println("meta : " + response.readUnsignedInt());
-
-            System.out.println();
-
-            int bytesToRead = response.readableBytes();
-            byte[] responseBytes = new byte[bytesToRead];
-            response.readBytes(responseBytes);
-
-            System.out.println("Response dump (hex) = = = = = = = = = = = = = = = = = = = = = = = = = =");
-
-            for(int i = 0; i < responseBytes.length; i++)
-            {
-                if(i % 10 == 0)
-                {
-                    System.out.println();
+                try {
+                    startLatch.await();
+                } catch (final InterruptedException e) {
+                    //Pokemon - gotta catch 'em all" !
                 }
 
-                System.out.print(String.format("     %02X", responseBytes[i]));
-            }
-            System.out.println("\n= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
-            System.out.println("\n========================================================================");
+                //construct get request.
+                final FlatBufferBuilder requestBuilder = new FlatBufferBuilder(0);
+                final String currentThreadName = Thread.currentThread().getName();
+                int requestPosition = requestBuilder.createString("GET /something/ " + currentThreadName);
 
+                demo.Request.startRequest(requestBuilder);
+                demo.Request.addName(requestBuilder, requestPosition);
+                final int root = demo.Request.endRequest(requestBuilder);
+                requestBuilder.finish(root);
 
-            latch.countDown();
-        });
+                final byte[] request = requestBuilder.sizedByteArray();
+
+                smfStorageClient.get(request, response -> {
+                    System.out.println(response.name());
+                    endLatch.countDown();
+                });
+
+            }).start();
+
+            //lets start all threads in one moment.
+            startLatch.countDown();
+        }
+
 
         //await response
-        latch.await();
+        endLatch.await();
 
         //close client
         smfClient.closeGracefully();

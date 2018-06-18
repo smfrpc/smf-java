@@ -14,18 +14,15 @@ public class RpcCallEncoder extends MessageToMessageEncoder<RpcCall> {
 
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
 
-    //FIXME
-    public static final int HARDCODED_SESSION_ID = 1;
-
     @Override
     protected void encode(final ChannelHandlerContext ctx, final RpcCall msg, final List<Object> out) {
 
+        System.out.println("[SESSION " + msg.getSessionId() + "] Encoding request");
+
         final byte[] body = msg.getBody();
         final long length = body.length;
-
-        //make request
-        final long meta = 212494116 ^ 1719559449; //example method call
-        final int sessionId = 1;
+        final long meta = msg.getMethodMeta();
+        final int sessionId = msg.getSessionId();
         final byte compression = (byte) 0;
         final byte bitFlags = (byte) 0;
 
@@ -40,7 +37,7 @@ public class RpcCallEncoder extends MessageToMessageEncoder<RpcCall> {
         byte[] dest = new byte[16];
 
         //fixme - I cannot even comment on this (｡◕‿‿◕｡)
-        System.arraycopy(bytes, 4, dest, 0, 16 );
+        System.arraycopy(bytes, 4, dest, 0, 16);
 
         final ByteBuf byteBuf = ctx.alloc().heapBuffer()
                 .writeBytes(dest)

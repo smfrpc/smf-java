@@ -6,7 +6,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-import static core.RpcCallEncoder.HARDCODED_SESSION_ID;
+import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
 public class SmfClient {
 
@@ -14,11 +15,14 @@ public class SmfClient {
     private final Bootstrap bootstrap;
     private final Dispatcher dispatcher;
     private volatile Channel channel;
+    private final SessionIdGenerator sessionIdGenerator;
 
     public SmfClient(final String host, final int port) throws InterruptedException {
+        sessionIdGenerator = new SessionIdGenerator();
+
         group = new NioEventLoopGroup(1);
 
-        dispatcher = new Dispatcher();
+        dispatcher = new Dispatcher(sessionIdGenerator);
 
         RpcCallEncoder rpcCallEncoder = new RpcCallEncoder();
         RpcCallDecoder rpcCallDecoder = new RpcCallDecoder();
@@ -32,7 +36,7 @@ public class SmfClient {
                     protected void initChannel(final SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
                         p.addLast(rpcCallEncoder);
-//                        p.addLast(rpcCallDecoder);
+                        p.addLast(rpcCallDecoder);
                         p.addLast(dispatcher);
                     }
                 });
@@ -49,14 +53,21 @@ public class SmfClient {
     }
 
     /**
-     * Perform RPC call.
+     * schedule RPC call
      *
-     * @param rpcCall identifying remote method.
-     * @return netty's internal ChannelFuture of write itself.
+     * @param methodMeta
+     * @param body
+     * @param callback
      */
-    public void executeAsync(final RpcCall rpcCall) {
+    public void executeAsync(long methodMeta, byte[] body, final Consumer<ByteBuffer> callback) {
+
+        int sessionId = sessionIdGenerator.next();
+        System.out.println("[executeAsync.GENERATED] " + sessionId);
+
+        final RpcCall rpcCall = new RpcCall(sessionId, methodMeta, body, callback);
+
         //fixme does put with concurrentHashMap guarantees that assignCallback will always HAPPENS BEFORE channe.write?
-        dispatcher.assignCallback(HARDCODED_SESSION_ID, rpcCall.getCallback());
+        dispatcher.assignCallback(sessionId, rpcCall.getCallback());
         channel.writeAndFlush(rpcCall);
     }
 
