@@ -29,7 +29,7 @@ public class SmfClient {
     public SmfClient(final String host, final int port) throws InterruptedException {
         sessionIdGenerator = new SessionIdGenerator();
 
-        group = new NioEventLoopGroup(7);
+        group = new NioEventLoopGroup(1);
 
         dispatcher = new Dispatcher(sessionIdGenerator);
 
