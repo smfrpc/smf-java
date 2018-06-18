@@ -5,11 +5,18 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class SmfClient {
+
+    private final static Logger LOG = LogManager.getLogger();
 
     private EventLoopGroup group;
     private final Bootstrap bootstrap;
@@ -17,10 +24,12 @@ public class SmfClient {
     private volatile Channel channel;
     private final SessionIdGenerator sessionIdGenerator;
 
+    final static AtomicInteger i = new AtomicInteger();
+
     public SmfClient(final String host, final int port) throws InterruptedException {
         sessionIdGenerator = new SessionIdGenerator();
 
-        group = new NioEventLoopGroup(1);
+        group = new NioEventLoopGroup(7);
 
         dispatcher = new Dispatcher(sessionIdGenerator);
 
@@ -35,13 +44,14 @@ public class SmfClient {
                     @Override
                     protected void initChannel(final SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
+                        p.addLast("debug", new LoggingHandler(LogLevel.INFO));
                         p.addLast(rpcCallEncoder);
                         p.addLast(rpcCallDecoder);
                         p.addLast(dispatcher);
                     }
                 });
 
-        System.out.println("Going to connect to 127.0.0.1 on port 7000");
+        LOG.info("Going to connect to 127.0.0.1 on port 7000");
 
         ChannelFuture connect = bootstrap.connect(host, port);
 
@@ -62,7 +72,8 @@ public class SmfClient {
     public void executeAsync(long methodMeta, byte[] body, final Consumer<ByteBuffer> callback) {
 
         int sessionId = sessionIdGenerator.next();
-        System.out.println("[executeAsync.GENERATED] " + sessionId);
+
+        LOG.info("Constructing RPC call for sessionId {}", sessionId);
 
         final RpcCall rpcCall = new RpcCall(sessionId, methodMeta, body, callback);
 

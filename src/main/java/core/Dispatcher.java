@@ -3,6 +3,9 @@ package core;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import smf.Header;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +18,8 @@ import java.util.function.Consumer;
  */
 public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
 
+    private final static Logger LOG = LogManager.getLogger();
+
     private final ConcurrentHashMap<Integer, Consumer<ByteBuf>> pendingRpcCalls = new ConcurrentHashMap<>();
 
     private SessionIdGenerator sessionIdGenerator;
@@ -26,18 +31,18 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcResponse msg) {
 
-        System.out.println("[channelRead0.RECEIVED] " + msg.getHeader().session());
+        LOG.debug("[session {}] received to dispatch", msg.getHeader().session());
         final Header header = msg.getHeader();
         Consumer consumer = pendingRpcCalls.remove(header.session());
 
         if (consumer == null) {
-            System.err.println("[SESSION " + msg.getHeader().session() +"]Registered handler is null ! ");
+            LOG.debug("[session {}] registered handler is null", msg.getHeader().session());
         } else {
             try {
                 //FIXME should it be called within event loop ?
                 consumer.accept(msg.getResponseBody());
             } catch (final Exception ex) {
-                System.err.println("[SESSION " + msg.getHeader().session() +"]" + ex);
+                LOG.error("[session {}] {}", msg.getHeader().session(), ex);
             }
         }
 

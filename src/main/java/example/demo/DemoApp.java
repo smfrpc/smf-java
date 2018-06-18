@@ -2,10 +2,15 @@ package example.demo;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import core.SmfClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.CountDownLatch;
 
 public class DemoApp {
+
+    private final static Logger LOG = LogManager.getLogger();
+
     public static void main(String... args) throws InterruptedException {
 
         final SmfClient smfClient = new SmfClient("127.0.0.1", 7000);
@@ -16,17 +21,9 @@ public class DemoApp {
         //lets schedule 100 concurrent requests
         final int concurrentConCount = 3;
         final CountDownLatch endLatch = new CountDownLatch(concurrentConCount);
-        final CountDownLatch startLatch = new CountDownLatch(concurrentConCount);
 
-        for(int i = 0; i < concurrentConCount; i++)
-        {
+        for (int i = 0; i < concurrentConCount; i++) {
             new Thread(() -> {
-
-                try {
-                    startLatch.await();
-                } catch (final InterruptedException e) {
-                    //Pokemon - gotta catch 'em all" !
-                }
 
                 //construct get request.
                 final FlatBufferBuilder requestBuilder = new FlatBufferBuilder(0);
@@ -41,14 +38,12 @@ public class DemoApp {
                 final byte[] request = requestBuilder.sizedByteArray();
 
                 smfStorageClient.get(request, response -> {
-                    System.out.println(response.name());
+                    LOG.info("Got parsed response {}", response.name());
                     endLatch.countDown();
                 });
 
             }).start();
 
-            //lets start all threads in one moment.
-            startLatch.countDown();
         }
 
 
