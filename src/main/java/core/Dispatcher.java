@@ -17,11 +17,8 @@ import java.util.function.Consumer;
  * Inspired by Dispatcher inside Datastax's Cassandra Java Driver.
  */
 public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
-
     private final static Logger LOG = LogManager.getLogger();
-
     private final ConcurrentHashMap<Integer, Consumer<ByteBuf>> pendingRpcCalls = new ConcurrentHashMap<>();
-
     private SessionIdGenerator sessionIdGenerator;
 
     public Dispatcher(final SessionIdGenerator sessionIdGenerator) {
@@ -30,7 +27,6 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcResponse msg) {
-
         LOG.debug("[session {}] received to dispatch", msg.getHeader().session());
         final Header header = msg.getHeader();
         Consumer consumer = pendingRpcCalls.remove(header.session());
@@ -45,7 +41,6 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
                 LOG.error("[session {}] {}", msg.getHeader().session(), ex);
             }
         }
-
         sessionIdGenerator.release(header.session());
     }
 

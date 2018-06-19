@@ -1,6 +1,5 @@
 package example.demo;
 
-import core.RpcCall;
 import core.SmfClient;
 import demo.Response;
 

@@ -5,7 +5,9 @@ import core.SmfClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 
 public class DemoApp {
 
@@ -19,11 +21,18 @@ public class DemoApp {
 
 
         //lets schedule 100 concurrent requests
-        final int concurrentConCount = 3;
+        final int concurrentConCount = 1000;
         final CountDownLatch endLatch = new CountDownLatch(concurrentConCount);
+        final CyclicBarrier cyclicBarrier = new CyclicBarrier(50);
 
         for (int i = 0; i < concurrentConCount; i++) {
             new Thread(() -> {
+
+                try {
+                    cyclicBarrier.await();
+                } catch (Exception ex) {
+                    LOG.error("Error occurred {}", ex);
+                }
 
                 //construct get request.
                 final FlatBufferBuilder requestBuilder = new FlatBufferBuilder(0);
@@ -45,7 +54,6 @@ public class DemoApp {
             }).start();
 
         }
-
 
         //await response
         endLatch.await();

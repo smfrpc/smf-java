@@ -3,16 +3,16 @@ package core;
 import smf.Header;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 public class RpcResponse {
 
     private final smf.Header header;
-    private final ByteBuffer repsonseBody;
+    private final ByteBuffer responseBody;
 
-    public RpcResponse(final smf.Header header, final ByteBuffer repsonseBody)
-    {
+    public RpcResponse(final smf.Header header, final ByteBuffer responseBody) {
         this.header = header;
-        this.repsonseBody = repsonseBody;
+        this.responseBody = responseBody;
     }
 
     public Header getHeader() {
@@ -20,7 +20,21 @@ public class RpcResponse {
     }
 
     public ByteBuffer getResponseBody() {
-        return repsonseBody;
+        return responseBody;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RpcResponse that = (RpcResponse) o;
+        return Objects.equals(header, that.header) &&
+                Objects.equals(responseBody, that.responseBody);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(header, responseBody);
+    }
 }

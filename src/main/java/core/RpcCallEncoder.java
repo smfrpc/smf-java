@@ -1,27 +1,27 @@
 package core;
 
-
 import com.google.flatbuffers.FlatBufferBuilder;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import net.openhft.hashing.LongHashFunction;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import smf.Header;
 
 import java.util.List;
 
-public class RpcCallEncoder extends MessageToMessageEncoder<RpcCall> {
-
+public class RpcCallEncoder extends MessageToMessageEncoder<RpcRequest> {
     private final static Logger LOG = LogManager.getLogger();
-
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, final RpcCall msg, final List<Object> out) {
+    protected void encode(final ChannelHandlerContext ctx, final RpcRequest msg, final List<Object> out) {
 
-        LOG.info("[session {}] encoding RpcCall", msg.getSessionId());
+        LOG.info("[session {}] encoding RpcRequest", msg.getSessionId());
 
         final byte[] body = msg.getBody();
         final long length = body.length;
@@ -48,7 +48,5 @@ public class RpcCallEncoder extends MessageToMessageEncoder<RpcCall> {
                 .writeBytes(body);
 
         out.add(byteBuf);
-
-
     }
 }

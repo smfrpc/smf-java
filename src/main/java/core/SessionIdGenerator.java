@@ -14,9 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * This class is ThreadSafe and can be accessed from multiple threads.
  */
 public class SessionIdGenerator {
-
     private final static Logger LOG = LogManager.getLogger();
-
     private static final int USHRT_MAX = 65535;
 
     private final Set<Integer> pendingSessions = ConcurrentHashMap.newKeySet();
@@ -28,7 +26,7 @@ public class SessionIdGenerator {
         int sessionId = sessionIdGen.incrementAndGet();
         pendingSessions.add(sessionId);
 
-        LOG.debug("Generated sessionId : {} " + sessionId);
+        LOG.debug("Generated sessionId : {} ", sessionId);
 
         return sessionId;
     }
