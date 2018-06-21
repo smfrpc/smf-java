@@ -1,14 +1,23 @@
 [![](https://img.shields.io/badge/unicorn-approved-ff69b4.svg)](https://www.youtube.com/watch?v=9auOCbH5Ns4)
 ![][license img]
 
-# smf-java
-
+### smf-java
 how to test ? for now just run
 ```bash
 ./gradlew run
 ```
 it will execute example.demo.DemoApp, which starts 1000requests in cycles per 50requests (one req == one thread).
 Of course, SMF server started on port 7000 is required.
+
+### API
+this highly depends on SMF code gen, but it should looks like :
+```java
+smfStorageClient.get(request)
+        .thenAccept(response -> {
+            //something
+        });
+```
+see DemoApp.java
 
 ## References
 

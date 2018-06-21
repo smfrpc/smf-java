@@ -1,9 +1,8 @@
 package example.demo;
 
-import core.SmfClient;
-import demo.Response;
+import smf.core.SmfClient;
 
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 public class SmfStorageClient {
 
@@ -15,10 +14,8 @@ public class SmfStorageClient {
         this.smfClient = smfClient;
     }
 
-    public void get(final byte[] body, final Consumer<demo.Response> callback) {
-        smfClient.executeAsync(GET_METHOD_META, body, (rawResponse) -> {
-            final Response rootAsResponse = Response.getRootAsResponse(rawResponse);
-            callback.accept(rootAsResponse);
-        });
+    public CompletableFuture<Response> get(final byte[] body) {
+        return smfClient.executeAsync(GET_METHOD_META, body)
+                .thenApply(Response::getRootAsResponse);
     }
 }

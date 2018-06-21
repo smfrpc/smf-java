@@ -1,11 +1,10 @@
 package example.demo;
 
 import com.google.flatbuffers.FlatBufferBuilder;
-import core.SmfClient;
+import smf.core.SmfClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 
@@ -19,8 +18,7 @@ public class DemoApp {
 
         final SmfStorageClient smfStorageClient = new SmfStorageClient(smfClient);
 
-
-        //lets schedule 100 concurrent requests
+        //lets schedule 1000 concurrent requests
         final int concurrentConCount = 1000;
         final CountDownLatch endLatch = new CountDownLatch(concurrentConCount);
         final CyclicBarrier cyclicBarrier = new CyclicBarrier(50);
@@ -39,17 +37,21 @@ public class DemoApp {
                 final String currentThreadName = Thread.currentThread().getName();
                 int requestPosition = requestBuilder.createString("GET /something/ " + currentThreadName);
 
-                demo.Request.startRequest(requestBuilder);
-                demo.Request.addName(requestBuilder, requestPosition);
-                final int root = demo.Request.endRequest(requestBuilder);
+                example.demo.Request.startRequest(requestBuilder);
+                example.demo.Request.addName(requestBuilder, requestPosition);
+                final int root = example.demo.Request.endRequest(requestBuilder);
                 requestBuilder.finish(root);
 
                 final byte[] request = requestBuilder.sizedByteArray();
 
-                smfStorageClient.get(request, response -> {
-                    LOG.info("Got parsed response {}", response.name());
-                    endLatch.countDown();
-                });
+                /**
+                 * Be careful here - thenAccept will be called from Netty EventLoop !
+                 */
+                smfStorageClient.get(request)
+                        .thenAccept(response -> {
+                            LOG.info("[{}] Got parsed response {}", Thread.currentThread().getName(), response.name());
+                            endLatch.countDown();
+                        });
 
             }).start();
 

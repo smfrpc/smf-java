@@ -1,4 +1,4 @@
-package core;
+package smf.core;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 

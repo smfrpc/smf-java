@@ -1,4 +1,4 @@
-package core;
+package smf.core;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -9,10 +9,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.ByteBuffer;
-import java.util.function.Consumer;
+import java.util.concurrent.*;
 
 public class SmfClient {
-
     private final static Logger LOG = LogManager.getLogger();
 
     private EventLoopGroup group;
@@ -23,9 +22,7 @@ public class SmfClient {
 
     public SmfClient(final String host, final int port) throws InterruptedException {
         sessionIdGenerator = new SessionIdGenerator();
-
         group = new NioEventLoopGroup(1);
-
         dispatcher = new Dispatcher(sessionIdGenerator);
 
         RpcCallEncoder rpcCallEncoder = new RpcCallEncoder();
@@ -47,7 +44,7 @@ public class SmfClient {
                     }
                 });
 
-        LOG.info("Going to connect to 127.0.0.1 on port 7000");
+        LOG.info("Going to connect to {} on port {}", host, port);
         ChannelFuture connect = bootstrap.connect(host, port);
 
         //ヽ( ͠°෴ °)ﾉ
@@ -61,15 +58,17 @@ public class SmfClient {
      *
      * @param methodMeta
      * @param body
-     * @param callback
+     * @return CompletableFuture representing result of RPC request.
      */
-    public void executeAsync(long methodMeta, byte[] body, final Consumer<ByteBuffer> callback) {
+    public CompletableFuture<ByteBuffer> executeAsync(long methodMeta, byte[] body) {
+        final CompletableFuture<ByteBuffer> resultFuture = new CompletableFuture<>();
         int sessionId = sessionIdGenerator.next();
         LOG.info("Constructing RPC call for sessionId {}", sessionId);
-        final RpcRequest rpcRequest = new RpcRequest(sessionId, methodMeta, body, callback);
-        dispatcher.assignCallback(sessionId, rpcRequest.getCallback());
-        //channel.isWritable() has to be checked before.
+        final RpcRequest rpcRequest = new RpcRequest(sessionId, methodMeta, body, resultFuture);
+        dispatcher.assignCallback(sessionId, rpcRequest.getResultFuture());
+        //TODO channel.isWritable() has to be checked before.
         channel.writeAndFlush(rpcRequest);
+        return resultFuture;
     }
 
     public void closeGracefully() throws InterruptedException {
