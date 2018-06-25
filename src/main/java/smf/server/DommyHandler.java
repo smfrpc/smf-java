@@ -2,6 +2,7 @@ package smf.server;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import smf.server.core.RpcRequest;
 
 /**
  * TODO: fixme REMOVE ME LATER ;D

@@ -1,6 +1,6 @@
 package example.demo.server;
 
-import smf.server.SmfServer;
+import smf.server.core.SmfServer;
 
 public class DemoServer {
     public static void main(final String... args) throws InterruptedException {

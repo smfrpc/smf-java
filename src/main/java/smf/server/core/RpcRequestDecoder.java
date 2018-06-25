@@ -1,11 +1,10 @@
-package smf.server;
+package smf.server.core;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import smf.client.core.RpcResponse;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
