@@ -1,4 +1,4 @@
-package smf.core;
+package smf.client.core;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,10 +15,10 @@ import java.util.List;
  * Parse incoming byte-stream into logical [smf.Header + response] pairs.
  * Logic behind is simple and of course not efficient - but is highly probable that it just works.
  *
- * RpcCallDecoder will try to decode each received bytes at once, if this operation fails, it will postpone
+ * RpcResponseDecoder will try to decode each received bytes at once, if this operation fails, it will postpone
  * this operation and try when next chunk arrive.
  */
-public class RpcCallDecoder extends ByteToMessageDecoder {
+public class RpcResponseDecoder extends ByteToMessageDecoder {
     private final static Logger LOG = LogManager.getLogger();
 
     @Override

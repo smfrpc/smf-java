@@ -1,4 +1,4 @@
-package smf.core;
+package smf.client.core;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

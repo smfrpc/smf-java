@@ -1,4 +1,4 @@
-package smf.core;
+package smf.client.core;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 
@@ -14,14 +14,16 @@ import smf.Header;
 
 import java.util.List;
 
-public class RpcCallEncoder extends MessageToMessageEncoder<RpcRequest> {
+public class RpcRequestEncoder extends MessageToMessageEncoder<RpcRequest> {
     private final static Logger LOG = LogManager.getLogger();
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, final RpcRequest msg, final List<Object> out) {
 
-        LOG.info("[session {}] encoding RpcRequest", msg.getSessionId());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[session {}] encoding RpcRequest", msg.getSessionId());
+        }
 
         final byte[] body = msg.getBody();
         final long length = body.length;

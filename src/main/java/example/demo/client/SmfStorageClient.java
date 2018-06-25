@@ -1,6 +1,7 @@
-package example.demo;
+package example.demo.client;
 
-import smf.core.SmfClient;
+import example.demo.Response;
+import smf.client.core.SmfClient;
 
 import java.util.concurrent.CompletableFuture;
 

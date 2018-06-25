@@ -1,4 +1,4 @@
-package smf.core;
+package smf.client.core;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -25,8 +25,8 @@ public class SmfClient {
         group = new NioEventLoopGroup(1);
         dispatcher = new Dispatcher(sessionIdGenerator);
 
-        RpcCallEncoder rpcCallEncoder = new RpcCallEncoder();
-        RpcCallDecoder rpcCallDecoder = new RpcCallDecoder();
+        RpcRequestEncoder rpcRequestEncoder = new RpcRequestEncoder();
+        RpcResponseDecoder rpcResponseDecoder = new RpcResponseDecoder();
 
         bootstrap = new Bootstrap();
         bootstrap.group(group)
@@ -38,8 +38,8 @@ public class SmfClient {
                         ChannelPipeline p = ch.pipeline();
                         //paranoid debug
 //                        p.addLast("debug", new LoggingHandler(LogLevel.INFO));
-                        p.addLast(rpcCallEncoder);
-                        p.addLast(rpcCallDecoder);
+                        p.addLast(rpcRequestEncoder);
+                        p.addLast(rpcResponseDecoder);
                         p.addLast(dispatcher);
                     }
                 });

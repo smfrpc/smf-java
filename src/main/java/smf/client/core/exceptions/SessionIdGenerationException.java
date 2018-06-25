@@ -1,4 +1,4 @@
-package smf.core.exceptions;
+package smf.client.core.exceptions;
 
 /**
  * Indicate

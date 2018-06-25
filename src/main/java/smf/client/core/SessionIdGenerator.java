@@ -1,6 +1,6 @@
-package smf.core;
+package smf.client.core;
 
-import smf.core.exceptions.SessionIdGenerationException;
+import smf.client.core.exceptions.SessionIdGenerationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
