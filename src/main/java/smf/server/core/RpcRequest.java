@@ -8,7 +8,7 @@ import java.util.Objects;
 public class RpcRequest {
 
     private final smf.Header header;
-    private final ByteBuffer responseBody;
+    private final ByteBuffer requestBody;
 
     @Override
     public boolean equals(Object o) {
@@ -16,26 +16,26 @@ public class RpcRequest {
         if (o == null || getClass() != o.getClass()) return false;
         RpcRequest that = (RpcRequest) o;
         return Objects.equals(header, that.header) &&
-                Objects.equals(responseBody, that.responseBody);
+                Objects.equals(requestBody, that.requestBody);
     }
 
     public Header getHeader() {
         return header;
     }
 
-    public ByteBuffer getResponseBody() {
-        return responseBody;
+    public ByteBuffer getRequestBody() {
+        return requestBody;
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(header, responseBody);
+        return Objects.hash(header, requestBody);
     }
 
-    public RpcRequest(final Header header, final ByteBuffer responseBody) {
+    public RpcRequest(final Header header, final ByteBuffer requestBody) {
         this.header = header;
-        this.responseBody = responseBody;
+        this.requestBody = requestBody;
     }
 
 }

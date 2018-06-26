@@ -25,8 +25,8 @@ public class SmfClient {
         group = new NioEventLoopGroup(1);
         dispatcher = new Dispatcher(sessionIdGenerator);
 
-        RpcRequestEncoder rpcRequestEncoder = new RpcRequestEncoder();
-        RpcResponseDecoder rpcResponseDecoder = new RpcResponseDecoder();
+        final RpcRequestEncoder rpcRequestEncoder = new RpcRequestEncoder();
+        final RpcResponseDecoder rpcResponseDecoder = new RpcResponseDecoder();
 
         bootstrap = new Bootstrap();
         bootstrap.group(group)

@@ -14,8 +14,10 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
     private final static Logger LOG = LogManager.getLogger();
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf request, List<Object> out) throws Exception {
-
+    protected void decode(final ChannelHandlerContext ctx, final ByteBuf request, final List<Object> out) {
+        /**
+         * TODO FIXME merge it with encoder/decoder stuff from client.core - remove duplication
+         */
         request.markReaderIndex();
         request.markWriterIndex();
 
