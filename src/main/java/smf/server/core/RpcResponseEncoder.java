@@ -1,34 +1,33 @@
-package smf.client.core;
+package smf.server.core;
 
 import com.google.flatbuffers.FlatBufferBuilder;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import net.openhft.hashing.LongHashFunction;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import smf.Header;
 
 import java.util.List;
 
-public class RpcRequestEncoder extends MessageToMessageEncoder<RpcRequest> {
+public class RpcResponseEncoder extends MessageToMessageEncoder<RpcGeneric> {
     private final static Logger LOG = LogManager.getLogger();
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, final RpcRequest msg, final List<Object> out) {
+    protected void encode(final ChannelHandlerContext ctx, final RpcGeneric response, final List<Object> out) {
+
+        final Header header = response.getHeader();
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("[session {}] encoding RpcGeneric", msg.getSessionId());
+            LOG.debug("[session {}] encoding RpcResponse", header.session());
         }
 
-        final byte[] body = msg.getBody();
+        final byte[] body = response.getRequestBody();
         final long length = body.length;
-        final long meta = msg.getMethodMeta();
-        final int sessionId = msg.getSessionId();
+        final long meta = header.meta();
+        final int sessionId = header.session();
         final byte compression = (byte) 0;
         final byte bitFlags = (byte) 0;
 

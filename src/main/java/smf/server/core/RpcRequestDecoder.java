@@ -36,7 +36,7 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
                 LOG.debug("[session {}] Decoding response", header.session());
             }
 
-            out.add(new RpcRequest(header, ByteBuffer.wrap(requestBody)));
+            out.add(new RpcGeneric(header, requestBody));
 
         } catch (final Exception ex) {
             if (LOG.isDebugEnabled()) {

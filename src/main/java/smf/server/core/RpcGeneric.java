@@ -2,19 +2,22 @@ package smf.server.core;
 
 import smf.Header;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
 
-public class RpcRequest {
-
+public class RpcGeneric {
     private final smf.Header header;
-    private final ByteBuffer requestBody;
+    private final byte[] requestBody;
+
+    public RpcGeneric(final Header header, final byte[] requestBody) {
+        this.header = header;
+        this.requestBody = requestBody;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RpcRequest that = (RpcRequest) o;
+        RpcGeneric that = (RpcGeneric) o;
         return Objects.equals(header, that.header) &&
                 Objects.equals(requestBody, that.requestBody);
     }
@@ -23,7 +26,7 @@ public class RpcRequest {
         return header;
     }
 
-    public ByteBuffer getRequestBody() {
+    public byte[] getRequestBody() {
         return requestBody;
     }
 
@@ -32,10 +35,4 @@ public class RpcRequest {
 
         return Objects.hash(header, requestBody);
     }
-
-    public RpcRequest(final Header header, final ByteBuffer requestBody) {
-        this.header = header;
-        this.requestBody = requestBody;
-    }
-
 }

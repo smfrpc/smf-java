@@ -8,6 +8,6 @@ public interface RpcService {
 
     long getServiceId();
 
-    Function<ByteBuffer, byte[]> getHandler(long id);
+    Function<byte[], byte[]> getHandler(long id);
 }
 

@@ -9,7 +9,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import smf.client.core.RpcRequestEncoder;
 
 public class SmfServer {
     private final static Logger LOG = LogManager.getLogger();
@@ -34,10 +33,9 @@ public class SmfServer {
                     protected void initChannel(Channel ch) {
                         final ChannelPipeline pipeline = ch.pipeline();
                         //p.addLast("debug", new LoggingHandler(LogLevel.INFO));
-                        pipeline.addLast(new RpcRequestEncoder());
+                        pipeline.addLast(new RpcResponseEncoder());
                         pipeline.addLast(new RpcRequestDecoder());
                         pipeline.addLast(requestHandler);
-                        //FIXME ensure non-sharable
                     }
                 });
 

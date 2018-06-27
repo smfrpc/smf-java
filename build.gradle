@@ -11,9 +11,6 @@ repositories {
     mavenCentral()
 }
 
-apply plugin:'application'
-mainClassName = "example.demo.DemoApp"
-
 dependencies {
     compile group: 'io.netty', name: 'netty-all', version: '4.1.25.Final'
     compile group: 'com.github.davidmoten', name: 'flatbuffers-java', version: '1.9.0.1'

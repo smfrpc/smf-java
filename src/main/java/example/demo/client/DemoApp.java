@@ -40,8 +40,6 @@ public class DemoApp {
                     endLatch.countDown();
                 });
 
-
-
         //await response
         endLatch.await();
 
