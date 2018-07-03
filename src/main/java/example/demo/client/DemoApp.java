@@ -38,6 +38,10 @@ public class DemoApp {
                 .thenAccept(response -> {
                     LOG.info("[{}] Got parsed response {}", Thread.currentThread().getName(), response.name());
                     endLatch.countDown();
+                })
+                .exceptionally(throwable -> {
+                    LOG.info("[{}] Got exception {}", Thread.currentThread().getName(), throwable);
+                    return null;
                 });
 
         //await response

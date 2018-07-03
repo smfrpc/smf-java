@@ -34,8 +34,15 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
             LOG.debug("[session {}] registered handler is null", msg.getHeader().session());
         } else {
             try {
-                //FIXME should it be called within event loop ?
-                resultFuture.complete(msg.getResponseBody());
+                if (msg instanceof InvalidRpcResponse) {
+                    final InvalidRpcResponse invalidRpcResponse = (InvalidRpcResponse) msg;
+                    resultFuture.completeExceptionally(invalidRpcResponse.cause);
+
+                } else {
+                    //FIXME should it be called within event loop ?
+                    resultFuture.complete(msg.getResponseBody());
+                }
+
             } catch (final Exception ex) {
                 resultFuture.completeExceptionally(ex);
             }
