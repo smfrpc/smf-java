@@ -5,6 +5,29 @@ plugins {
 group 'smf-java'
 version '1.0-SNAPSHOT'
 
+//create a single Jar with all dependencies
+task buildServerExample(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Example of server',
+                'Implementation-Version': version,
+                'Main-Class': 'example.demo.server.DemoServer'
+    }
+    baseName = project.name + '-server'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task buildClientExample(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Example of client',
+                'Implementation-Version': version,
+                'Main-Class': 'example.demo.client.DemoApp'
+    }
+    baseName = project.name + '-client'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 sourceCompatibility = 1.8
 
 repositories {

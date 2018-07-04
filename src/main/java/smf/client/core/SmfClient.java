@@ -64,10 +64,10 @@ public class SmfClient {
         final CompletableFuture<ByteBuffer> resultFuture = new CompletableFuture<>();
         int sessionId = sessionIdGenerator.next();
         LOG.info("Constructing RPC call for sessionId {}", sessionId);
-        final RpcRequest rpcRequest = new RpcRequest(sessionId, methodMeta, body, resultFuture);
-        dispatcher.assignCallback(sessionId, rpcRequest.getResultFuture());
+        final PreparedRpcRequest preparedRpcRequest = new PreparedRpcRequest(sessionId, methodMeta, body, resultFuture);
+        dispatcher.assignCallback(sessionId, preparedRpcRequest.getResultFuture());
         //TODO channel.isWritable() has to be checked before.
-        channel.writeAndFlush(rpcRequest);
+        channel.writeAndFlush(preparedRpcRequest);
         return resultFuture;
     }
 

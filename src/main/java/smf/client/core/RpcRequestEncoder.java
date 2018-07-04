@@ -14,15 +14,15 @@ import smf.Header;
 
 import java.util.List;
 
-public class RpcRequestEncoder extends MessageToMessageEncoder<RpcRequest> {
+public class RpcRequestEncoder extends MessageToMessageEncoder<PreparedRpcRequest> {
     private final static Logger LOG = LogManager.getLogger();
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, final RpcRequest msg, final List<Object> out) {
+    protected void encode(final ChannelHandlerContext ctx, final PreparedRpcRequest msg, final List<Object> out) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("[session {}] encoding RpcRequest", msg.getSessionId());
+            LOG.debug("[session {}] encoding PreparedRpcRequest", msg.getSessionId());
         }
 
         final byte[] body = msg.getBody();

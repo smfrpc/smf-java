@@ -5,13 +5,18 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-public class RpcRequest {
+/**
+ * This is not called RpcRequest because it :
+ * 1. doesn't contain full Header
+ * 2. contain stuff not related to requests itself.
+ */
+public class PreparedRpcRequest {
     private final int sessionId;
     private final long methodMeta;
     private final byte[] body;
     private final CompletableFuture<ByteBuffer> resultFuture;
 
-    public RpcRequest(final int sessionId, long methodMeta, byte[] body, final CompletableFuture<ByteBuffer> resultFuture) {
+    public PreparedRpcRequest(final int sessionId, long methodMeta, byte[] body, final CompletableFuture<ByteBuffer> resultFuture) {
         this.sessionId = sessionId;
         this.methodMeta = methodMeta;
         this.body = body;
@@ -38,7 +43,7 @@ public class RpcRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RpcRequest that = (RpcRequest) o;
+        PreparedRpcRequest that = (PreparedRpcRequest) o;
         return sessionId == that.sessionId &&
                 methodMeta == that.methodMeta &&
                 Arrays.equals(body, that.body) &&
