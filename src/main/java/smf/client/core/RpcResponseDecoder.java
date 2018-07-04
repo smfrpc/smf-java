@@ -7,7 +7,9 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import net.openhft.hashing.LongHashFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import smf.exceptions.InvalidChecksumException;
+import smf.common.InvalidRpcResponse;
+import smf.common.RpcResponse;
+import smf.common.exceptions.InvalidChecksumException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

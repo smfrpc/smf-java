@@ -8,15 +8,17 @@ import net.openhft.hashing.LongHashFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import smf.Header;
+import smf.common.RpcRequest;
+import smf.common.RpcResponse;
 
 import java.util.List;
 
-public class RpcResponseEncoder extends MessageToMessageEncoder<RpcGeneric> {
+public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
     private final static Logger LOG = LogManager.getLogger();
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, final RpcGeneric response, final List<Object> out) {
+    protected void encode(final ChannelHandlerContext ctx, final RpcResponse response, final List<Object> out) {
 
         final Header header = response.getHeader();
 
@@ -24,7 +26,9 @@ public class RpcResponseEncoder extends MessageToMessageEncoder<RpcGeneric> {
             LOG.debug("[session {}] encoding RpcResponse", header.session());
         }
 
-        final byte[] body = response.getRequestBody();
+        final byte[] body = new byte[response.getBody().remaining()];
+        response.getBody().get(body);
+
         final long length = body.length;
         final long meta = header.meta();
         final int sessionId = header.session();

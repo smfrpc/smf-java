@@ -6,13 +6,15 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import smf.Header;
+import smf.common.InvalidRpcResponse;
+import smf.common.RpcResponse;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Dispatcher is responsible for managing callbacks based on sessionId (fixme ensure sessionId uniques)
+ * Dispatcher is responsible for managing callbacks based on sessionId.
  * Inspired by Dispatcher inside Datastax's Cassandra Java Driver.
  */
 public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
@@ -36,11 +38,11 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
             try {
                 if (msg instanceof InvalidRpcResponse) {
                     final InvalidRpcResponse invalidRpcResponse = (InvalidRpcResponse) msg;
-                    resultFuture.completeExceptionally(invalidRpcResponse.cause);
+                    resultFuture.completeExceptionally(invalidRpcResponse.getCause());
 
                 } else {
                     //FIXME should it be called within event loop ?
-                    resultFuture.complete(msg.getResponseBody());
+                    resultFuture.complete(msg.getBody());
                 }
 
             } catch (final Exception ex) {

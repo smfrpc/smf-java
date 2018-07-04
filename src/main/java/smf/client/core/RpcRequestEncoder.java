@@ -22,7 +22,7 @@ public class RpcRequestEncoder extends MessageToMessageEncoder<RpcRequest> {
     protected void encode(final ChannelHandlerContext ctx, final RpcRequest msg, final List<Object> out) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("[session {}] encoding RpcGeneric", msg.getSessionId());
+            LOG.debug("[session {}] encoding RpcRequest", msg.getSessionId());
         }
 
         final byte[] body = msg.getBody();

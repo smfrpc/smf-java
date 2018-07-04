@@ -1,4 +1,4 @@
-package smf.client.core;
+package smf.common;
 
 import smf.Header;
 

@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import smf.common.RpcRequest;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -32,11 +33,12 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
             final byte[] requestBody = new byte[(int) header.size()];
             request.readBytes(requestBody);
 
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug("[session {}] Decoding response", header.session());
             }
 
-            out.add(new RpcGeneric(header, requestBody));
+            out.add(new RpcRequest(header, ByteBuffer.wrap(requestBody)));
 
         } catch (final Exception ex) {
             if (LOG.isDebugEnabled()) {

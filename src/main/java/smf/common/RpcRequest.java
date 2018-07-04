@@ -1,38 +1,39 @@
-package smf.server.core;
+package smf.common;
 
 import smf.Header;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
-public class RpcGeneric {
+public class RpcRequest {
     private final smf.Header header;
-    private final byte[] requestBody;
+    private final ByteBuffer body;
 
-    public RpcGeneric(final Header header, final byte[] requestBody) {
+    public RpcRequest(final Header header, final ByteBuffer body) {
         this.header = header;
-        this.requestBody = requestBody;
+        this.body = body;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RpcGeneric that = (RpcGeneric) o;
+        RpcRequest that = (RpcRequest) o;
         return Objects.equals(header, that.header) &&
-                Objects.equals(requestBody, that.requestBody);
+                Objects.equals(body, that.body);
     }
 
     public Header getHeader() {
         return header;
     }
 
-    public byte[] getRequestBody() {
-        return requestBody;
+    public ByteBuffer getBody() {
+        return body;
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(header, requestBody);
+        return Objects.hash(header, body);
     }
 }
