@@ -10,12 +10,19 @@ import org.apache.logging.log4j.Logger;
 import smf.Header;
 import smf.common.RpcRequest;
 import smf.common.RpcResponse;
+import smf.common.compression.CompressionService;
 
 import java.util.List;
 
 public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
     private final static Logger LOG = LogManager.getLogger();
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
+
+    private final CompressionService compressionService;
+
+    public RpcResponseEncoder(final CompressionService compressionService) {
+        this.compressionService = compressionService;
+    }
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, final RpcResponse response, final List<Object> out) {
@@ -26,8 +33,7 @@ public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
             LOG.debug("[session {}] encoding RpcResponse", header.session());
         }
 
-        final byte[] body = new byte[response.getBody().remaining()];
-        response.getBody().get(body);
+        final byte[] body = compressionService.processBody(header.compression(), response.getBody());
 
         final long length = body.length;
         final long meta = header.meta();

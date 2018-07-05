@@ -6,6 +6,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import smf.common.RpcRequest;
+import smf.common.compression.CompressionService;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -13,6 +14,13 @@ import java.util.List;
 
 public class RpcRequestDecoder extends ByteToMessageDecoder {
     private final static Logger LOG = LogManager.getLogger();
+
+    private final CompressionService compressionService;
+
+    public RpcRequestDecoder(final CompressionService compressionService)
+    {
+        this.compressionService = compressionService;
+    }
 
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf request, final List<Object> out) {

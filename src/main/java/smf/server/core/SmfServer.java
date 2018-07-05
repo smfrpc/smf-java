@@ -9,6 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import smf.common.compression.CompressionService;
 
 public class SmfServer {
     private final static Logger LOG = LogManager.getLogger();
@@ -24,6 +25,8 @@ public class SmfServer {
 
         requestHandler = new RequestHandler();
 
+        final CompressionService compressionService = new CompressionService();
+
         ServerBootstrap b = new ServerBootstrap();
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -33,8 +36,8 @@ public class SmfServer {
                     protected void initChannel(Channel ch) {
                         final ChannelPipeline pipeline = ch.pipeline();
                         //p.addLast("debug", new LoggingHandler(LogLevel.INFO));
-                        pipeline.addLast(new RpcResponseEncoder());
-                        pipeline.addLast(new RpcRequestDecoder());
+                        pipeline.addLast(new RpcResponseEncoder(compressionService));
+                        pipeline.addLast(new RpcRequestDecoder(compressionService));
                         pipeline.addLast(requestHandler);
                     }
                 });
