@@ -7,6 +7,7 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import net.openhft.hashing.LongHashFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import smf.CompressionFlags;
 import smf.Header;
 import smf.common.RpcRequest;
 import smf.common.RpcResponse;
@@ -33,15 +34,12 @@ public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
             LOG.debug("[session {}] encoding RpcResponse", header.session());
         }
 
-//        final byte[] body = compressionService.processBody(header.compression(), response.getBody());
-
-        final byte[] body = new byte[response.getBody().remaining()];
-        response.getBody().get(body);
+        final byte[] body = compressionService.compressBody(header.compression(), response.getBody());
 
         final long length = body.length;
         final long meta = header.meta();
         final int sessionId = header.session();
-        final byte compression = (byte) 0;
+        final byte compression = CompressionFlags.Zstd;
         final byte bitFlags = (byte) 0;
 
         final long maxUnsignedInt = MAX_UNSIGNED_INT;

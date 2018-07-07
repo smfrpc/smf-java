@@ -48,7 +48,8 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
             }
 
             /**
-             * FIXME in case of decompressed body, size in header indicates compressed one.
+             * header indicates size of received body, it will be different than body passed further
+             * because decompression process.
              */
             out.add(new RpcRequest(header, ByteBuffer.wrap(decompressBody)));
 

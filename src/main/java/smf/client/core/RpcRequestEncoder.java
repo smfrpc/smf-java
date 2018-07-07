@@ -34,7 +34,7 @@ public class RpcRequestEncoder extends MessageToMessageEncoder<PreparedRpcReques
         }
 
 //        final byte[] body = msg.getBody();
-        final byte[] body = compressionService.processBody(CompressionFlags.Zstd, msg.getBody()); /* FIXME */
+        final byte[] body = compressionService.compressBody(CompressionFlags.Zstd, msg.getBody()); /* FIXME */
 
         final long length = body.length;
         final long meta = msg.getMethodMeta();

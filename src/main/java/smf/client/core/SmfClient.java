@@ -31,7 +31,7 @@ public class SmfClient {
         final CompressionService compressionService = new CompressionService();
 
         final RpcRequestEncoder rpcRequestEncoder = new RpcRequestEncoder(compressionService);
-        final RpcResponseDecoder rpcResponseDecoder = new RpcResponseDecoder();
+        final RpcResponseDecoder rpcResponseDecoder = new RpcResponseDecoder(compressionService);
 
         bootstrap = new Bootstrap();
         bootstrap.group(group)
@@ -42,7 +42,7 @@ public class SmfClient {
                     protected void initChannel(final SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
                         //paranoid debug
-                        p.addLast("debug", new LoggingHandler(LogLevel.INFO));
+//                        p.addLast("debug", new LoggingHandler(LogLevel.INFO));
                         p.addLast(rpcRequestEncoder);
                         p.addLast(rpcResponseDecoder);
                         p.addLast(dispatcher);

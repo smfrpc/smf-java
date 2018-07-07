@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import smf.common.InvalidRpcResponse;
 import smf.common.RpcResponse;
+import smf.common.compression.CompressionService;
 import smf.common.exceptions.InvalidChecksumException;
 
 import java.nio.ByteBuffer;
@@ -26,6 +27,11 @@ public class RpcResponseDecoder extends ByteToMessageDecoder {
     private final static Logger LOG = LogManager.getLogger();
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
 
+    private final CompressionService compressionService;
+
+    public RpcResponseDecoder(final CompressionService compressionService) {
+        this.compressionService = compressionService;
+    }
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf response, List<Object> out) {
 
@@ -40,18 +46,21 @@ public class RpcResponseDecoder extends ByteToMessageDecoder {
             smf.Header header = new smf.Header();
             header.__init(0, bb);
 
-            final byte[] responseBody = new byte[(int) header.size()];
-            response.readBytes(responseBody);
+            //decompress if-needed
+            final byte[] bodyArray = new byte[response.readableBytes()];
+            response.readBytes(bodyArray);
+
+            byte[] decompressBody = compressionService.decompressBody(header.compression(), bodyArray);
 
             LOG.debug("[session {}] Decoding response", header.session());
 
-            final long checkSum = MAX_UNSIGNED_INT & LongHashFunction.xx().hashBytes(responseBody);
+            final long checkSum = MAX_UNSIGNED_INT & LongHashFunction.xx().hashBytes(bodyArray);
 
             if (checkSum != header.checksum()) {
                 InvalidChecksumException exception = new InvalidChecksumException("Received checksum is invalid, expected : " + checkSum + " and received " + header.checksum());
                 out.add(new InvalidRpcResponse(header, exception));
             } else {
-                out.add(new RpcResponse(header, ByteBuffer.wrap(responseBody)));
+                out.add(new RpcResponse(header, ByteBuffer.wrap(decompressBody)));
             }
 
         } catch (final Exception ex) {
