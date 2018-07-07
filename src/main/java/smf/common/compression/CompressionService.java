@@ -55,20 +55,11 @@ public class CompressionService {
          * for ZSTD, SMF add size on the begging of body.
          */
         byte[] dstBuff = new byte[(int)zstd.compressBound(body.length)];
-        int bytesWritten = (int)zstd.compress(dstBuff, body, 3);
+        int bytesWritten = (int)zstd.compress(dstBuff, body, 0);
 
         byte[] onlyCompressedBytes = Arrays.copyOfRange(dstBuff, 0, bytesWritten);
 
-        // XD
-        ByteBuf buff = ByteBufAllocator.DEFAULT.buffer(bytesWritten + 4);
-
-        buff.writeInt(bytesWritten);
-        buff.writeBytes(onlyCompressedBytes);
-        buff.resetReaderIndex();
-
-        final byte[] finalDestination = new byte[buff.readableBytes()];
-        buff.readBytes(finalDestination);
-        return finalDestination;
+        return onlyCompressedBytes;
     }
 
     /**
