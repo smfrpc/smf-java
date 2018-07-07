@@ -17,8 +17,7 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
 
     private final CompressionService compressionService;
 
-    public RpcRequestDecoder(final CompressionService compressionService)
-    {
+    public RpcRequestDecoder(final CompressionService compressionService) {
         this.compressionService = compressionService;
     }
 
@@ -41,12 +40,17 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
             final byte[] requestBody = new byte[(int) header.size()];
             request.readBytes(requestBody);
 
+            //decompress if-needed
+            byte[] decompressBody = compressionService.decompressBody(header.compression(), requestBody);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("[session {}] Decoding response", header.session());
             }
 
-            out.add(new RpcRequest(header, ByteBuffer.wrap(requestBody)));
+            /**
+             * FIXME in case of decompressed body, size in header indicates compressed one.
+             */
+            out.add(new RpcRequest(header, ByteBuffer.wrap(decompressBody)));
 
         } catch (final Exception ex) {
             if (LOG.isDebugEnabled()) {

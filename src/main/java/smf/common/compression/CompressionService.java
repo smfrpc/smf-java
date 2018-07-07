@@ -50,10 +50,6 @@ public class CompressionService {
     }
 
     private byte[] compressUsingZstd(byte[] body) {
-
-        /**
-         * for ZSTD, SMF add size on the begging of body.
-         */
         byte[] dstBuff = new byte[(int)zstd.compressBound(body.length)];
         int bytesWritten = (int)zstd.compress(dstBuff, body, 0);
 
