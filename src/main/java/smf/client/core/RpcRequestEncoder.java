@@ -10,13 +10,21 @@ import net.openhft.hashing.LongHashFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import smf.CompressionFlags;
 import smf.Header;
+import smf.common.compression.CompressionService;
 
 import java.util.List;
 
 public class RpcRequestEncoder extends MessageToMessageEncoder<PreparedRpcRequest> {
     private final static Logger LOG = LogManager.getLogger();
     private final static long MAX_UNSIGNED_INT = (long) (Math.pow(2, 32) - 1);
+
+    private final CompressionService compressionService;
+
+    public RpcRequestEncoder(final CompressionService compressionService) {
+        this.compressionService = compressionService;
+    }
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, final PreparedRpcRequest msg, final List<Object> out) {
@@ -25,11 +33,13 @@ public class RpcRequestEncoder extends MessageToMessageEncoder<PreparedRpcReques
             LOG.debug("[session {}] encoding PreparedRpcRequest", msg.getSessionId());
         }
 
-        final byte[] body = msg.getBody();
+//        final byte[] body = msg.getBody();
+        final byte[] body = compressionService.processBody(CompressionFlags.Zstd, msg.getBody()); /* FIXME */
+
         final long length = body.length;
         final long meta = msg.getMethodMeta();
         final int sessionId = msg.getSessionId();
-        final byte compression = (byte) 0;
+        final byte compression = CompressionFlags.Zstd;
         final byte bitFlags = (byte) 0;
 
         final long maxUnsignedInt = MAX_UNSIGNED_INT;

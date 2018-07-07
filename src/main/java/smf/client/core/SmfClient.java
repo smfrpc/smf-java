@@ -5,8 +5,11 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import smf.common.compression.CompressionService;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.*;
@@ -25,7 +28,9 @@ public class SmfClient {
         group = new NioEventLoopGroup(1);
         dispatcher = new Dispatcher(sessionIdGenerator);
 
-        final RpcRequestEncoder rpcRequestEncoder = new RpcRequestEncoder();
+        final CompressionService compressionService = new CompressionService();
+
+        final RpcRequestEncoder rpcRequestEncoder = new RpcRequestEncoder(compressionService);
         final RpcResponseDecoder rpcResponseDecoder = new RpcResponseDecoder();
 
         bootstrap = new Bootstrap();
@@ -37,7 +42,7 @@ public class SmfClient {
                     protected void initChannel(final SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
                         //paranoid debug
-//                        p.addLast("debug", new LoggingHandler(LogLevel.INFO));
+                        p.addLast("debug", new LoggingHandler(LogLevel.INFO));
                         p.addLast(rpcRequestEncoder);
                         p.addLast(rpcResponseDecoder);
                         p.addLast(dispatcher);

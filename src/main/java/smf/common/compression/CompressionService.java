@@ -1,9 +1,12 @@
 package smf.common.compression;
 
 import com.github.luben.zstd.Zstd;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import smf.CompressionFlags;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * Provide simple interface for compression/decompression operations using algorithms supported by SMF.
@@ -46,10 +49,26 @@ public class CompressionService {
         return processBody(compressionFlags, bodyArray);
     }
 
-    public byte[] compressUsingZstd(byte[] body) {
-        byte[] dstBuff = new byte[body.length];
-        zstd.compress(dstBuff, body, 0);
-        return dstBuff;
+    private byte[] compressUsingZstd(byte[] body) {
+
+        /**
+         * for ZSTD, SMF add size on the begging of body.
+         */
+        byte[] dstBuff = new byte[(int)zstd.compressBound(body.length)];
+        int bytesWritten = (int)zstd.compress(dstBuff, body, 3);
+
+        byte[] onlyCompressedBytes = Arrays.copyOfRange(dstBuff, 0, bytesWritten);
+
+        // XD
+        ByteBuf buff = ByteBufAllocator.DEFAULT.buffer(bytesWritten + 4);
+
+        buff.writeInt(bytesWritten);
+        buff.writeBytes(onlyCompressedBytes);
+        buff.resetReaderIndex();
+
+        final byte[] finalDestination = new byte[buff.readableBytes()];
+        buff.readBytes(finalDestination);
+        return finalDestination;
     }
 
     /**
@@ -70,9 +89,9 @@ public class CompressionService {
         }
     }
 
-    public byte[] decompressUsingZstd(byte[] body) {
+    private byte[] decompressUsingZstd(byte[] body) {
         long decompressedSize = zstd.decompressedSize(body);
-        byte[] decompressedDst = new byte[(int)decompressedSize];
+        byte[] decompressedDst = new byte[(int) decompressedSize];
         zstd.decompress(decompressedDst, body);
         return decompressedDst;
     }
