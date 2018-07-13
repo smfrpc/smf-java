@@ -41,7 +41,10 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
             request.readBytes(requestBody);
 
             //decompress if-needed
-            byte[] decompressBody = compressionService.decompressBody(header.compression(), requestBody);
+//            byte[] decompressBody = compressionService.decompressBody(header.compression(), requestBody);
+
+            //FIXME wait to be unblock by SMF core end-to-end testing
+
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("[session {}] Decoding response", header.session());
@@ -51,7 +54,7 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
              * header indicates size of received body, it will be different than body passed further
              * because decompression process.
              */
-            out.add(new RpcRequest(header, ByteBuffer.wrap(decompressBody)));
+            out.add(new RpcRequest(header, ByteBuffer.wrap(requestBody)));
 
         } catch (final Exception ex) {
             if (LOG.isDebugEnabled()) {

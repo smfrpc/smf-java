@@ -34,7 +34,11 @@ public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
             LOG.debug("[session {}] encoding RpcResponse", header.session());
         }
 
-        final byte[] body = compressionService.compressBody(header.compression(), response.getBody());
+//        final byte[] body = compressionService.compressBody(header.compression(), response.getBody());
+
+        //FIXME wait to be unblock by SMF core end-to-end testing
+        final byte[] body = new byte[response.getBody().remaining()];
+        response.getBody().get(body);
 
         final long length = body.length;
         final long meta = header.meta();

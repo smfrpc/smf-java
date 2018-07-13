@@ -33,8 +33,8 @@ public class RpcRequestEncoder extends MessageToMessageEncoder<PreparedRpcReques
             LOG.debug("[session {}] encoding PreparedRpcRequest", msg.getSessionId());
         }
 
-//        final byte[] body = msg.getBody();
-        final byte[] body = compressionService.compressBody(CompressionFlags.Zstd, msg.getBody()); /* FIXME */
+        final byte[] body = msg.getBody();
+//        final byte[] body = compressionService.compressBody(CompressionFlags.Zstd, msg.getBody()); /* FIXME */
 
         final long length = body.length;
         final long meta = msg.getMethodMeta();

@@ -50,7 +50,7 @@ public class RpcResponseDecoder extends ByteToMessageDecoder {
             final byte[] bodyArray = new byte[response.readableBytes()];
             response.readBytes(bodyArray);
 
-            byte[] decompressBody = compressionService.decompressBody(header.compression(), bodyArray);
+//            byte[] decompressBody = compressionService.decompressBody(header.compression(), bodyArray);
 
             LOG.debug("[session {}] Decoding response", header.session());
 
@@ -60,7 +60,7 @@ public class RpcResponseDecoder extends ByteToMessageDecoder {
                 InvalidChecksumException exception = new InvalidChecksumException("Received checksum is invalid, expected : " + checkSum + " and received " + header.checksum());
                 out.add(new InvalidRpcResponse(header, exception));
             } else {
-                out.add(new RpcResponse(header, ByteBuffer.wrap(decompressBody)));
+                out.add(new RpcResponse(header, ByteBuffer.wrap(bodyArray)));
             }
 
         } catch (final Exception ex) {
