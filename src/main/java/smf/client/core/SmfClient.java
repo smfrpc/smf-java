@@ -9,6 +9,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import smf.CompressionFlags;
 import smf.common.compression.CompressionService;
 
 import java.nio.ByteBuffer;
@@ -69,7 +70,10 @@ public class SmfClient {
         final CompletableFuture<ByteBuffer> resultFuture = new CompletableFuture<>();
         int sessionId = sessionIdGenerator.next();
         LOG.info("Constructing RPC call for sessionId {}", sessionId);
-        final PreparedRpcRequest preparedRpcRequest = new PreparedRpcRequest(sessionId, methodMeta, body, resultFuture);
+
+        //FIXME Who should be interested in settings compression ?
+        final RpcRequestOptions rpcRequestOptions = new RpcRequestOptions(CompressionFlags.Zstd);
+        final PreparedRpcRequest preparedRpcRequest = new PreparedRpcRequest(sessionId, methodMeta, body, resultFuture, rpcRequestOptions);
         dispatcher.assignCallback(sessionId, preparedRpcRequest.getResultFuture());
         //TODO channel.isWritable() has to be checked before.
         channel.writeAndFlush(preparedRpcRequest);

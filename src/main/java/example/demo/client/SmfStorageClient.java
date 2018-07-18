@@ -1,6 +1,7 @@
 package example.demo.client;
 
 import example.demo.Response;
+import smf.CompressionFlags;
 import smf.client.core.SmfClient;
 
 import java.util.concurrent.CompletableFuture;

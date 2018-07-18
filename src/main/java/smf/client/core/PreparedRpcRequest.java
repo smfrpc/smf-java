@@ -15,12 +15,14 @@ public class PreparedRpcRequest {
     private final long methodMeta;
     private final byte[] body;
     private final CompletableFuture<ByteBuffer> resultFuture;
+    private final RpcRequestOptions rpcRequestOptions;
 
-    public PreparedRpcRequest(final int sessionId, long methodMeta, byte[] body, final CompletableFuture<ByteBuffer> resultFuture) {
+    public PreparedRpcRequest(final int sessionId, long methodMeta, byte[] body, final CompletableFuture<ByteBuffer> resultFuture, final RpcRequestOptions rpcRequestOptions) {
         this.sessionId = sessionId;
         this.methodMeta = methodMeta;
         this.body = body;
         this.resultFuture = resultFuture;
+        this.rpcRequestOptions = rpcRequestOptions;
     }
 
     public int getSessionId() {
@@ -35,6 +37,10 @@ public class PreparedRpcRequest {
         return body;
     }
 
+    public RpcRequestOptions getRpcRequestOptions() {
+        return rpcRequestOptions;
+    }
+
     public CompletableFuture<ByteBuffer> getResultFuture() {
         return resultFuture;
     }
@@ -47,13 +53,14 @@ public class PreparedRpcRequest {
         return sessionId == that.sessionId &&
                 methodMeta == that.methodMeta &&
                 Arrays.equals(body, that.body) &&
-                Objects.equals(resultFuture, that.resultFuture);
+                Objects.equals(resultFuture, that.resultFuture) &&
+                Objects.equals(rpcRequestOptions, that.rpcRequestOptions);
     }
 
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(sessionId, methodMeta, resultFuture);
+        int result = Objects.hash(sessionId, methodMeta, resultFuture, rpcRequestOptions);
         result = 31 * result + Arrays.hashCode(body);
         return result;
     }

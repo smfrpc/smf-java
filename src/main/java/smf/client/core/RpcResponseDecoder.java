@@ -32,6 +32,7 @@ public class RpcResponseDecoder extends ByteToMessageDecoder {
     public RpcResponseDecoder(final CompressionService compressionService) {
         this.compressionService = compressionService;
     }
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf response, List<Object> out) {
 
@@ -50,17 +51,22 @@ public class RpcResponseDecoder extends ByteToMessageDecoder {
             final byte[] bodyArray = new byte[response.readableBytes()];
             response.readBytes(bodyArray);
 
-//            byte[] decompressBody = compressionService.decompressBody(header.compression(), bodyArray);
+            byte[] decompressBody = compressionService.decompressBody(header.compression(), bodyArray);
 
-            LOG.debug("[session {}] Decoding response", header.session());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("[session {}] Decoding response", header.session());
+            }
 
+            /**
+             * checksum is always executed on original body.
+             */
             final long checkSum = MAX_UNSIGNED_INT & LongHashFunction.xx().hashBytes(bodyArray);
 
             if (checkSum != header.checksum()) {
                 InvalidChecksumException exception = new InvalidChecksumException("Received checksum is invalid, expected : " + checkSum + " and received " + header.checksum());
                 out.add(new InvalidRpcResponse(header, exception));
             } else {
-                out.add(new RpcResponse(header, ByteBuffer.wrap(bodyArray)));
+                out.add(new RpcResponse(header, ByteBuffer.wrap(decompressBody)));
             }
 
         } catch (final Exception ex) {

@@ -3,6 +3,8 @@ package smf.server.core;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import smf.Header;
 import smf.common.RpcRequest;
 import smf.common.RpcResponse;
@@ -15,6 +17,8 @@ import java.util.function.Function;
 
 @ChannelHandler.Sharable
 public class RequestHandler extends SimpleChannelInboundHandler<RpcRequest> {
+    private final static Logger LOG = LogManager.getLogger();
+
     final CopyOnWriteArrayList<RpcService> serviceIdToFunctionHandler = new CopyOnWriteArrayList<>();
 
     @Override
@@ -28,6 +32,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<RpcRequest> {
                 .findFirst();
 
         if (!requestHandler.isPresent()) {
+            LOG.error("Request handler for request is not registered !");
             //TODO handler the case where meta is not registered
         }
 

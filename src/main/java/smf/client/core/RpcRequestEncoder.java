@@ -33,13 +33,14 @@ public class RpcRequestEncoder extends MessageToMessageEncoder<PreparedRpcReques
             LOG.debug("[session {}] encoding PreparedRpcRequest", msg.getSessionId());
         }
 
-        final byte[] body = msg.getBody();
-//        final byte[] body = compressionService.compressBody(CompressionFlags.Zstd, msg.getBody()); /* FIXME */
+        final RpcRequestOptions rpcRequestOptions = msg.getRpcRequestOptions();
+
+        final byte[] body = compressionService.compressBody(rpcRequestOptions.getCompression(), msg.getBody());
 
         final long length = body.length;
         final long meta = msg.getMethodMeta();
         final int sessionId = msg.getSessionId();
-        final byte compression = CompressionFlags.Zstd;
+        final byte compression = rpcRequestOptions.getCompression();
         final byte bitFlags = (byte) 0;
 
         final long maxUnsignedInt = MAX_UNSIGNED_INT;
@@ -52,7 +53,7 @@ public class RpcRequestEncoder extends MessageToMessageEncoder<PreparedRpcReques
 
         byte[] dest = new byte[16];
 
-        //fixme - I cannot even comment on this (｡◕‿‿◕｡)
+        //fixme - I cannot even comment on this ( ͡° ͜ʖ ͡° )つ──☆*:・ﾟ
         System.arraycopy(bytes, 4, dest, 0, 16);
 
         final ByteBuf byteBuf = ctx.alloc().heapBuffer()
