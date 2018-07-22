@@ -11,6 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import smf.CompressionFlags;
 import smf.common.compression.CompressionService;
+import smf.common.transport.BootstrapFactory;
+import smf.common.transport.ClientTransport;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.*;
@@ -18,8 +20,7 @@ import java.util.concurrent.*;
 /**
  * Expose low-level interface interface for SMF-protocol communication.
  * Single SmfClient open one connection and this single connection is used for SMF-Server communication.
- *
- * In case of closed connection (for example by server in case of error) no retry is 
+ * In case of closed connection (for example by server in case of error) no retry is scheduled.
  */
 public class SmfClient {
     private final static Logger LOG = LogManager.getLogger();
@@ -31,8 +32,11 @@ public class SmfClient {
     private final SessionIdGenerator sessionIdGenerator;
 
     public SmfClient(final String host, final int port) throws InterruptedException {
+
+        final ClientTransport clientBootstrap = BootstrapFactory.getClientBootstrap();
+
         sessionIdGenerator = new SessionIdGenerator();
-        group = new NioEventLoopGroup(1);
+        group = clientBootstrap.getGroup();
         dispatcher = new Dispatcher(sessionIdGenerator);
 
         final CompressionService compressionService = new CompressionService();
@@ -40,21 +44,18 @@ public class SmfClient {
         final RpcRequestEncoder rpcRequestEncoder = new RpcRequestEncoder(compressionService);
         final RpcResponseDecoder rpcResponseDecoder = new RpcResponseDecoder(compressionService);
 
-        bootstrap = new Bootstrap();
-        bootstrap.group(group)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(final SocketChannel ch) {
-                        ChannelPipeline p = ch.pipeline();
-                        //paranoid debug
+        bootstrap = clientBootstrap.getBootstrap();
+        bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            protected void initChannel(final SocketChannel ch) {
+                ChannelPipeline p = ch.pipeline();
+                //paranoid debug
 //                        p.addLast("debug", new LoggingHandler(LogLevel.INFO));
-                        p.addLast(rpcRequestEncoder);
-                        p.addLast(rpcResponseDecoder);
-                        p.addLast(dispatcher);
-                    }
-                });
+                p.addLast(rpcRequestEncoder);
+                p.addLast(rpcResponseDecoder);
+                p.addLast(dispatcher);
+            }
+        });
 
         LOG.info("Going to connect to {} on port {}", host, port);
         ChannelFuture connect = bootstrap.connect(host, port);

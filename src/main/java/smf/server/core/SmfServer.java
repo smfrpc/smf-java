@@ -10,6 +10,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import smf.common.compression.CompressionService;
+import smf.common.transport.BootstrapFactory;
+import smf.common.transport.ServerTransport;
 
 public class SmfServer {
     private final static Logger LOG = LogManager.getLogger();
@@ -20,27 +22,26 @@ public class SmfServer {
     private final RequestHandler requestHandler;
 
     public SmfServer(final String host, final int port) throws InterruptedException {
-        bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup();
+        final ServerTransport serverBootstrap = BootstrapFactory.getServerBootstrap();
+
+        bossGroup = serverBootstrap.getBossGroup();
+        workerGroup = serverBootstrap.getWorkerGroup();
 
         requestHandler = new RequestHandler();
 
         final CompressionService compressionService = new CompressionService();
 
-        ServerBootstrap b = new ServerBootstrap();
-        b.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                //.handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new ChannelInitializer() {
-                    @Override
-                    protected void initChannel(Channel ch) {
-                        final ChannelPipeline pipeline = ch.pipeline();
-                        //p.addLast("debug", new LoggingHandler(LogLevel.INFO));
-                        pipeline.addLast(new RpcResponseEncoder(compressionService));
-                        pipeline.addLast(new RpcRequestDecoder(compressionService));
-                        pipeline.addLast(requestHandler);
-                    }
-                });
+        ServerBootstrap b = serverBootstrap.getServerBootstrap();
+        b.childHandler(new ChannelInitializer() {
+            @Override
+            protected void initChannel(Channel ch) {
+                final ChannelPipeline pipeline = ch.pipeline();
+                //p.addLast("debug", new LoggingHandler(LogLevel.INFO));
+                pipeline.addLast(new RpcResponseEncoder(compressionService));
+                pipeline.addLast(new RpcRequestDecoder(compressionService));
+                pipeline.addLast(requestHandler);
+            }
+        });
 
         LOG.info("Going to listen on {}:{}", host, port);
 
