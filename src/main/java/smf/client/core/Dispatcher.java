@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import smf.Header;
 import smf.common.InvalidRpcResponse;
 import smf.common.RpcResponse;
+import smf.common.exceptions.ClosedRpcRequestException;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
@@ -52,8 +53,26 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
         sessionIdGenerator.release(header.session());
     }
 
+    /**
+     * Drain all pending RPC request and complete them exceptionally.
+     * Method implement no locking.
+     *
+     * @param cause message forwarded with exception up to awaiting request.
+     */
+    public void forceCloseOnAwaitingRequests(final String cause) {
+        //of course size() here is not atomic ;D
+        LOG.error("Forcing close on all pending (count={}) RPC requests", pendingRpcCalls.size());
+        pendingRpcCalls.entrySet()
+                .forEach(waitingRpcRequest -> //
+                        waitingRpcRequest.getValue().completeExceptionally(new ClosedRpcRequestException(cause)));
+    }
+
     public void assignCallback(final int sessionId, final CompletableFuture<ByteBuffer> resultFuture) {
         pendingRpcCalls.put(sessionId, resultFuture);
     }
 
+    @Override
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
+       LOG.error("Exception in the chain occurred, cause : {}", cause);
+    }
 }

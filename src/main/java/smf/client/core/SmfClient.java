@@ -15,6 +15,12 @@ import smf.common.compression.CompressionService;
 import java.nio.ByteBuffer;
 import java.util.concurrent.*;
 
+/**
+ * Expose low-level interface interface for SMF-protocol communication.
+ * Single SmfClient open one connection and this single connection is used for SMF-Server communication.
+ *
+ * In case of closed connection (for example by server in case of error) no retry is 
+ */
 public class SmfClient {
     private final static Logger LOG = LogManager.getLogger();
 
@@ -54,7 +60,17 @@ public class SmfClient {
         ChannelFuture connect = bootstrap.connect(host, port);
 
         //ヽ( ͠°෴ °)ﾉ
-        connect.addListener(result -> channel = connect.channel());
+        connect.addListener(result -> {
+            channel = connect.channel();
+
+            /**
+             * a little bit hack, but someone has to handle closed connection from SMF.
+             */
+            channel.closeFuture().addListener(closedChannel ->
+                    dispatcher.forceCloseOnAwaitingRequests("Connection closed"));
+        });
+
+
         //fixme not best solution - but most important is to have working client
         connect.sync().await();
     }
@@ -72,7 +88,7 @@ public class SmfClient {
         LOG.info("Constructing RPC call for sessionId {}", sessionId);
 
         //FIXME Who should be interested in settings compression ?
-        final RpcRequestOptions rpcRequestOptions = new RpcRequestOptions(CompressionFlags.Zstd);
+        final RpcRequestOptions rpcRequestOptions = new RpcRequestOptions(CompressionFlags.Lz4);
         final PreparedRpcRequest preparedRpcRequest = new PreparedRpcRequest(sessionId, methodMeta, body, resultFuture, rpcRequestOptions);
         dispatcher.assignCallback(sessionId, preparedRpcRequest.getResultFuture());
         //TODO channel.isWritable() has to be checked before.

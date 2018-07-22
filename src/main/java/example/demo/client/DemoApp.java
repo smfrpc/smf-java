@@ -14,7 +14,7 @@ public class DemoApp {
 
     public static void main(String... args) throws InterruptedException {
 
-        final SmfClient smfClient = new SmfClient("127.0.0.1", 7000);
+        final SmfClient smfClient = new SmfClient("127.0.0.1", 7001);
         final SmfStorageClient smfStorageClient = new SmfStorageClient(smfClient);
 
         final CountDownLatch endLatch = new CountDownLatch(1);
@@ -40,7 +40,8 @@ public class DemoApp {
                     endLatch.countDown();
                 })
                 .exceptionally(throwable -> {
-                    LOG.info("[{}] Got exception {}", Thread.currentThread().getName(), throwable);
+                    LOG.info("[{}] Got exception {}", Thread.currentThread().getName(), throwable.getCause());
+                    endLatch.countDown();
                     return null;
                 });
 
