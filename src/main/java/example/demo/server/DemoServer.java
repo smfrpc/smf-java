@@ -14,7 +14,7 @@ public class DemoServer {
     private final static Logger LOG = LogManager.getLogger();
 
     public static void main(final String... args) throws InterruptedException {
-        final SmfServer smfServer = new SmfServer("127.0.0.1", 7001);
+        final SmfServer smfServer = new SmfServer("127.0.0.1", 7000);
         LOG.debug("Listening for requests ! common !");
         final StorageService storageService = new StorageService();
         smfServer.registerStorageService(storageService);

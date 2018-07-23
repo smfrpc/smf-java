@@ -89,7 +89,7 @@ public class SmfClient {
         LOG.info("Constructing RPC call for sessionId {}", sessionId);
 
         //FIXME Who should be interested in settings compression ?
-        final RpcRequestOptions rpcRequestOptions = new RpcRequestOptions(CompressionFlags.Lz4);
+        final RpcRequestOptions rpcRequestOptions = new RpcRequestOptions(CompressionFlags.None);
         final PreparedRpcRequest preparedRpcRequest = new PreparedRpcRequest(sessionId, methodMeta, body, resultFuture, rpcRequestOptions);
         dispatcher.assignCallback(sessionId, preparedRpcRequest.getResultFuture());
         //TODO channel.isWritable() has to be checked before.
