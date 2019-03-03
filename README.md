@@ -19,8 +19,8 @@ If are familiar with internals of SMF, you can use smf.client.core.SmfClient and
 
 ## References
 
-* [Main Repository](https://github.com/senior7515/smf) - smf source code
-* [Official Documentation](https://senior7515.github.io/smf/) - smf documentation
+* [Main Repository](https://github.com/smfrpc/smf) - smf source code
+* [Official Documentation](https://smfrpc.github.io/smf/) - smf documentation
 
 ## Powered by
 <img src="http://normanmaurer.me/presentations/2014-netflix-netty/images/netty_logo.png" height="75" width="150">
