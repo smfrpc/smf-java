@@ -23,66 +23,68 @@ import org.apache.logging.log4j.Logger;
  * TODO allow to pass Options (socket, threads count, etc.)
  */
 public class BootstrapFactory {
-    private final static Logger LOG = LogManager.getLogger();
+  private final static Logger LOG = LogManager.getLogger();
 
-    public static ClientTransport getClientBootstrap() {
-        LOG.info("Going to create client bootstrap.");
+  public static ClientTransport
+  getClientBootstrap() {
+    LOG.info("Going to create client bootstrap.");
 
-        final Bootstrap bootstrap = new Bootstrap();
+    final Bootstrap bootstrap = new Bootstrap();
 
-        EventLoopGroup group;
-        Class<? extends Channel> channelClass;
-        boolean isNative;
-        if (Epoll.isAvailable()) {
-            LOG.info("Native epoll transport is available.");
+    EventLoopGroup group;
+    Class<? extends Channel> channelClass;
+    boolean isNative;
+    if (Epoll.isAvailable()) {
+      LOG.info("Native epoll transport is available.");
 
-            channelClass = EpollSocketChannel.class;
-            group = new EpollEventLoopGroup(1);
-            isNative = true;
-        } else {
-            LOG.info("Default transport layer used.");
+      channelClass = EpollSocketChannel.class;
+      group = new EpollEventLoopGroup(1);
+      isNative = true;
+    } else {
+      LOG.info("Default transport layer used.");
 
-            channelClass = NioSocketChannel.class;
-            group = new NioEventLoopGroup(1);
-            isNative = false;
-        }
-
-        bootstrap.group(group)
-                .channel(channelClass)
-                .option(ChannelOption.TCP_NODELAY, true);
-
-        return new ClientTransport(isNative, group, bootstrap);
+      channelClass = NioSocketChannel.class;
+      group = new NioEventLoopGroup(1);
+      isNative = false;
     }
 
-    public static ServerTransport getServerBootstrap() {
-        LOG.info("Going to create server bootstrap.");
+    bootstrap.group(group)
+      .channel(channelClass)
+      .option(ChannelOption.TCP_NODELAY, true);
 
-        final ServerBootstrap serverBootstrap = new ServerBootstrap();
+    return new ClientTransport(isNative, group, bootstrap);
+  }
 
-        EventLoopGroup bossGroup;
-        EventLoopGroup workerGroup;
+  public static ServerTransport
+  getServerBootstrap() {
+    LOG.info("Going to create server bootstrap.");
 
-        Class<? extends ServerChannel> channelClass;
-        boolean isNative;
-        if (Epoll.isAvailable()) {
-            LOG.info("Native epoll transport is available.");
+    final ServerBootstrap serverBootstrap = new ServerBootstrap();
 
-            channelClass = EpollServerSocketChannel.class;
-            bossGroup = new EpollEventLoopGroup(1);
-            workerGroup = new EpollEventLoopGroup();
-            isNative = true;
-        } else {
-            LOG.info("Default transport layer used.");
+    EventLoopGroup bossGroup;
+    EventLoopGroup workerGroup;
 
-            channelClass = NioServerSocketChannel.class;
-            bossGroup = new NioEventLoopGroup(1);
-            workerGroup = new NioEventLoopGroup();
-            isNative = false;
-        }
+    Class<? extends ServerChannel> channelClass;
+    boolean isNative;
+    if (Epoll.isAvailable()) {
+      LOG.info("Native epoll transport is available.");
 
-        serverBootstrap.group(bossGroup, workerGroup)
-                .channel(channelClass);
+      channelClass = EpollServerSocketChannel.class;
+      bossGroup = new EpollEventLoopGroup(1);
+      workerGroup = new EpollEventLoopGroup();
+      isNative = true;
+    } else {
+      LOG.info("Default transport layer used.");
 
-        return new ServerTransport(isNative, bossGroup, workerGroup, serverBootstrap);
+      channelClass = NioServerSocketChannel.class;
+      bossGroup = new NioEventLoopGroup(1);
+      workerGroup = new NioEventLoopGroup();
+      isNative = false;
     }
+
+    serverBootstrap.group(bossGroup, workerGroup).channel(channelClass);
+
+    return new ServerTransport(isNative, bossGroup, workerGroup,
+                               serverBootstrap);
+  }
 }

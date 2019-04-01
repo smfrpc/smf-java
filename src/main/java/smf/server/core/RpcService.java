@@ -7,10 +7,9 @@ import java.nio.ByteBuffer;
 import java.util.function.Function;
 
 public interface RpcService {
-    String getServiceName();
+  String getServiceName();
 
-    long getServiceId();
+  long getServiceId();
 
-    Function<byte[], byte[]> getHandler(long id);
+  Function<byte[], byte[]> getHandler(long id);
 }
-
