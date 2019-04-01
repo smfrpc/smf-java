@@ -1,4 +1,3 @@
-[![](https://img.shields.io/badge/unicorn-approved-ff69b4.svg)](https://www.youtube.com/watch?v=9auOCbH5Ns4)
 ![][license img]
 
 ### smf-java
@@ -16,6 +15,13 @@ java -jar ./build/libs/smf-java-client-1.0-SNAPSHOT.jar
 
 ### API
 If are familiar with internals of SMF, you can use smf.client.core.SmfClient and smf.server.core.SmfServer directly, if not, just look at examples.
+
+### Contribution
+Before raising PR be sure tu run
+```
+python fmt.py
+```
+
 
 ## References
 
