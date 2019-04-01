@@ -1,3 +1,6 @@
+// Copyright 2019 SMF Authors
+//
+
 package smf.common;
 
 import smf.Header;

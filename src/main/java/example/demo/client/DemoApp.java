@@ -1,3 +1,6 @@
+// Copyright 2019 SMF Authors
+//
+
 package example.demo.client;
 
 import com.google.flatbuffers.FlatBufferBuilder;

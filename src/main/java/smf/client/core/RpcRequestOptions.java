@@ -1,3 +1,6 @@
+// Copyright 2019 SMF Authors
+//
+
 package smf.client.core;
 
 import java.util.Objects;

@@ -1,3 +1,6 @@
+// Copyright 2019 SMF Authors
+//
+
 package smf.common.compression;
 
 import com.github.luben.zstd.Zstd;
