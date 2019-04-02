@@ -19,7 +19,7 @@ If are familiar with internals of SMF, you can use smf.client.core.SmfClient and
 ### Contribution
 Before raising PR be sure tu run
 ```
-python fmt.py
+python3 fmt.py
 ```
 
 

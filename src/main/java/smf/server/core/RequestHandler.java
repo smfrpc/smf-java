@@ -32,13 +32,13 @@ public class RequestHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     Optional<Function<byte[], byte[]>> requestHandler =
       serviceIdToFunctionHandler.stream()
-        .map(rpcService -> rpcService.getHandler(meta))  //
-        .filter(Objects::nonNull)                        //
+        .map(rpcService -> rpcService.getHandler(meta))
+        .filter(Objects::nonNull)
         .findFirst();
 
     if (!requestHandler.isPresent()) {
       LOG.error("Request handler for request is not registered !");
-      // TODO handler the case where meta is not registered
+      // TODO handle the case where meta is not registered
     }
 
     Function<byte[], byte[]> rpcRequestFunction = requestHandler.get();

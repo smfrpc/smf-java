@@ -30,7 +30,7 @@ public class DemoServer {
 class StorageService implements RpcService {
   private final static Logger LOG = LogManager.getLogger();
 
-  private static long GET_METHOD_META = 212494116 ^ 1719559449;
+  private static final long GET_METHOD_META = 212494116 ^ 1719559449;
 
   private final Function<byte[], byte[]> RESPONSE_HANDLER = (request) -> {
     final FlatBufferBuilder responseBuilder = new FlatBufferBuilder(0);

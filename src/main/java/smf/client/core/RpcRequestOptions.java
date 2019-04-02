@@ -32,7 +32,6 @@ public class RpcRequestOptions {
   @Override
   public int
   hashCode() {
-
     return Objects.hash(compression);
   }
 }

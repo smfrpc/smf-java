@@ -56,9 +56,8 @@ public class SmfClient {
       @Override
       protected void initChannel(final SocketChannel ch) {
         ChannelPipeline p = ch.pipeline();
-        // paranoid debug
-        //                        p.addLast("debug", new
-        //                        LoggingHandler(LogLevel.INFO));
+        // In case you need to log all stuff incoming and outgoing, uncomment:
+        // p.addLast("debug", new LoggingHandler(LogLevel.INFO));
         p.addLast(rpcRequestEncoder);
         p.addLast(rpcResponseDecoder);
         p.addLast(dispatcher);

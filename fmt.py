@@ -57,14 +57,6 @@ def get_build_dir_type(d):
     return build_dir
 
 
-def get_debug_build_dir():
-    return get_build_dir_type("debug")
-
-
-def get_release_build_dir():
-    return get_build_dir_type("release")
-
-
 def run_subprocess(cmd):
     logger.debug("Executing command: %s" % cmd)
     proc = subprocess.Popen(
@@ -135,7 +127,7 @@ def is_clang_fmt_file(filename):
     return False
 
 def is_ignored_file(filename):
-    for ext in ["PayloadHeaders.java", "HeaderBitFlags.java", "Header.java", "DynamicHeader.java", "CompressionFlags.java"]:
+    for ext in ["PayloadHeaders.java", "HeaderBitFlags.java", "Header.java", "DynamicHeader.java", "CompressionFlags.java", "Request.java", "Response.java"]:
         if filename.endswith(ext): return False
     return True
 

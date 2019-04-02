@@ -41,6 +41,7 @@ public class SmfServer {
       @Override
       protected void initChannel(Channel ch) {
         final ChannelPipeline pipeline = ch.pipeline();
+        // In case you need to log all stuff incoming and outgoing, uncomment:
         // p.addLast("debug", new LoggingHandler(LogLevel.INFO));
         pipeline.addLast(new RpcResponseEncoder(compressionService));
         pipeline.addLast(new RpcRequestDecoder(compressionService));

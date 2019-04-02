@@ -69,8 +69,7 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
               pendingRpcCalls.size());
     pendingRpcCalls.entrySet().forEach(
       waitingRpcRequest
-      ->  //
-      waitingRpcRequest.getValue().completeExceptionally(
+      -> waitingRpcRequest.getValue().completeExceptionally(
         new ClosedRpcRequestException(cause)));
   }
 
