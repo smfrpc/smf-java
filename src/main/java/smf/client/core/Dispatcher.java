@@ -32,13 +32,15 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
   @Override
   protected void
   channelRead0(ChannelHandlerContext ctx, RpcResponse msg) {
-    LOG.debug("[session {}] received to dispatch", msg.getHeader().session());
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("[session {}] received to dispatch", msg.getHeader().session());
+    }
     final Header header = msg.getHeader();
     final CompletableFuture<ByteBuffer> resultFuture =
       pendingRpcCalls.remove(header.session());
 
     if (resultFuture == null) {
-      LOG.debug("[session {}] registered handler is null",
+      LOG.error("[session {}] registered handler is null",
                 msg.getHeader().session());
     } else {
       try {
@@ -47,7 +49,6 @@ public class Dispatcher extends SimpleChannelInboundHandler<RpcResponse> {
           resultFuture.completeExceptionally(invalidRpcResponse.getCause());
 
         } else {
-          // FIXME should it be called within event loop ?
           resultFuture.complete(msg.getBody());
         }
 

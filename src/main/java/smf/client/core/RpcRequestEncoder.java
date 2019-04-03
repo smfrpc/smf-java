@@ -59,7 +59,6 @@ public class RpcRequestEncoder
 
     byte[] dest = new byte[16];
 
-    // fixme - I cannot even comment on this ( ͡° ͜ʖ ͡° )つ──☆*:・ﾟ
     System.arraycopy(bytes, 4, dest, 0, 16);
 
     final ByteBuf byteBuf =

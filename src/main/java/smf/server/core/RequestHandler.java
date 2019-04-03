@@ -48,9 +48,14 @@ public class RequestHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     byte[] response = rpcRequestFunction.apply(body);
 
-    // kek XD
+
     final RpcResponse rpcResponse =
       new RpcResponse(header, ByteBuffer.wrap(response));
+
+    /*
+     * writeAndFlush fired for each single request can potentially cause problems, but atm
+     * that is ok. In future please consider request coalescing and some flush-scheduler.
+     */
     ctx.channel().writeAndFlush(rpcResponse);
   }
 

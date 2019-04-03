@@ -97,7 +97,9 @@ public class SmfClient {
     final CompletableFuture<ByteBuffer> resultFuture =
       new CompletableFuture<>();
     int sessionId = sessionIdGenerator.next();
-    LOG.info("Constructing RPC call for sessionId {}", sessionId);
+    if (LOG.isDebugEnabled()) {
+      LOG.info("Constructing RPC call for sessionId {}", sessionId);
+    }
 
     // FIXME Who should be interested in settings compression ?
     final RpcRequestOptions rpcRequestOptions =

@@ -18,7 +18,6 @@ import smf.client.core.exceptions.SessionIdGenerationException;
  * https://github.com/KowalczykBartek/smf-java/issues/3
  */
 public class SessionIdGenerator {
-  private Boolean TRUE = new Boolean(true);
   private static final byte MAX_RETRIES = 5;
 
   private final static Logger LOG = LogManager.getLogger();
@@ -51,7 +50,7 @@ public class SessionIdGenerator {
       int sessionIdAttempt =
         sessionIdGen.incrementAndGet() % USHRT_MAX_PLUS_ONE;
 
-      if (pendingSessions.putIfAbsent(sessionIdAttempt, TRUE) == null) {
+      if (pendingSessions.putIfAbsent(sessionIdAttempt, true) == null) {
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("Generated sessionId : {} ", sessionIdAttempt);

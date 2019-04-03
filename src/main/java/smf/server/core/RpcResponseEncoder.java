@@ -11,9 +11,7 @@ import java.util.List;
 import net.openhft.hashing.LongHashFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import smf.CompressionFlags;
 import smf.Header;
-import smf.common.RpcRequest;
 import smf.common.RpcResponse;
 import smf.common.compression.CompressionService;
 
@@ -47,9 +45,8 @@ public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
     final byte compression = header.compression();
     final byte bitFlags = (byte)0;
 
-    final long maxUnsignedInt = MAX_UNSIGNED_INT;
     final long checkSum =
-      maxUnsignedInt & LongHashFunction.xx().hashBytes(body);
+            MAX_UNSIGNED_INT & LongHashFunction.xx().hashBytes(body);
 
     final FlatBufferBuilder internalRequest = new FlatBufferBuilder(20);
     int headerPosition =
@@ -60,7 +57,6 @@ public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
 
     byte[] dest = new byte[16];
 
-    // fixme - I cannot even comment on this (｡◕‿‿◕｡)
     System.arraycopy(bytes, 4, dest, 0, 16);
 
     final ByteBuf byteBuf =
