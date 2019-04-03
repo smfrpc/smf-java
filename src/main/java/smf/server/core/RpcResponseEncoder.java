@@ -46,7 +46,7 @@ public class RpcResponseEncoder extends MessageToMessageEncoder<RpcResponse> {
     final byte bitFlags = (byte)0;
 
     final long checkSum =
-            MAX_UNSIGNED_INT & LongHashFunction.xx().hashBytes(body);
+      MAX_UNSIGNED_INT & LongHashFunction.xx().hashBytes(body);
 
     final FlatBufferBuilder internalRequest = new FlatBufferBuilder(20);
     int headerPosition =
