@@ -3,14 +3,16 @@
 
 package smf.server.core;
 
+import static smf.common.CodingHelper.initHeader;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import smf.Header;
 import smf.common.RpcRequest;
 import smf.common.compression.CompressionService;
 
@@ -27,20 +29,14 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
   protected void
   decode(final ChannelHandlerContext ctx, final ByteBuf request,
          final List<Object> out) {
-    /**
-     * TODO FIXME merge it with encoder/decoder stuff from client.core - remove
-     * duplication
-     */
+
     request.markReaderIndex();
     request.markWriterIndex();
 
     try {
       byte[] hdrbytes = new byte[16];
       request.readBytes(hdrbytes);
-      ByteBuffer bb = ByteBuffer.wrap(hdrbytes);
-      bb.order(ByteOrder.LITTLE_ENDIAN);
-      smf.Header header = new smf.Header();
-      header.__init(0, bb);
+      Header header = initHeader(hdrbytes);
 
       final byte[] requestBody = new byte[(int)header.size()];
       request.readBytes(requestBody);
@@ -48,8 +44,6 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
       // decompress if-needed
       byte[] decompressBody =
         compressionService.decompressBody(header.compression(), requestBody);
-
-      // FIXME wait to be unblock by SMF core end-to-end testing
 
       if (LOG.isDebugEnabled()) {
         LOG.debug("[session {}] Decoding response", header.session());
@@ -60,7 +54,6 @@ public class RpcRequestDecoder extends ByteToMessageDecoder {
        * passed further because decompression process.
        */
       out.add(new RpcRequest(header, ByteBuffer.wrap(decompressBody)));
-
     } catch (final Exception ex) {
       if (LOG.isDebugEnabled()) { LOG.debug("Failed to parse ! postpone ..."); }
       request.resetReaderIndex();

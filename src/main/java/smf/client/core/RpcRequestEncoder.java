@@ -3,22 +3,19 @@
 
 package smf.client.core;
 
-import com.google.flatbuffers.FlatBufferBuilder;
+import static smf.common.CodingHelper.encodeHeader;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import java.util.List;
-import net.openhft.hashing.LongHashFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import smf.CompressionFlags;
-import smf.Header;
 import smf.common.compression.CompressionService;
 
 public class RpcRequestEncoder
   extends MessageToMessageEncoder<PreparedRpcRequest> {
   private final static Logger LOG = LogManager.getLogger();
-  private final static long MAX_UNSIGNED_INT = (long)(Math.pow(2, 32) - 1);
 
   private final CompressionService compressionService;
 
@@ -40,26 +37,9 @@ public class RpcRequestEncoder
     final byte[] body = compressionService.compressBody(
       rpcRequestOptions.getCompression(), msg.getBody());
 
-    final long length = body.length;
-    final long meta = msg.getMethodMeta();
-    final int sessionId = msg.getSessionId();
-    final byte compression = rpcRequestOptions.getCompression();
-    final byte bitFlags = (byte)0;
-
-    final long maxUnsignedInt = MAX_UNSIGNED_INT;
-    final long checkSum =
-      maxUnsignedInt & LongHashFunction.xx().hashBytes(body);
-
-    final FlatBufferBuilder internalRequest = new FlatBufferBuilder(20);
-    int headerPosition =
-      Header.createHeader(internalRequest, compression, bitFlags, sessionId,
-                          length, checkSum, meta);
-    internalRequest.finish(headerPosition);
-    byte[] bytes = internalRequest.sizedByteArray();
-
-    byte[] dest = new byte[16];
-
-    System.arraycopy(bytes, 4, dest, 0, 16);
+    final byte[] dest =
+      encodeHeader(msg.getMethodMeta(), msg.getSessionId(),
+                   rpcRequestOptions.getCompression(), (byte)0, body);
 
     final ByteBuf byteBuf =
       ctx.alloc().heapBuffer().writeBytes(dest).writeBytes(body);

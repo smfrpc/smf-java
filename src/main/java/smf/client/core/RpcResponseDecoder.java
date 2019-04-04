@@ -3,15 +3,18 @@
 
 package smf.client.core;
 
+import static smf.common.CodingHelper.calculateCheckSum;
+import static smf.common.CodingHelper.initHeader;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 import net.openhft.hashing.LongHashFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import smf.Header;
 import smf.common.InvalidRpcResponse;
 import smf.common.RpcResponse;
 import smf.common.compression.CompressionService;
@@ -26,7 +29,6 @@ import smf.common.exceptions.InvalidChecksumException;
  */
 public class RpcResponseDecoder extends ByteToMessageDecoder {
   private final static Logger LOG = LogManager.getLogger();
-  private final static long MAX_UNSIGNED_INT = (long)(Math.pow(2, 32) - 1);
 
   private final CompressionService compressionService;
 
@@ -44,10 +46,7 @@ public class RpcResponseDecoder extends ByteToMessageDecoder {
     try {
       byte[] hdrbytes = new byte[16];
       response.readBytes(hdrbytes);
-      ByteBuffer bb = ByteBuffer.wrap(hdrbytes);
-      bb.order(ByteOrder.LITTLE_ENDIAN);
-      smf.Header header = new smf.Header();
-      header.__init(0, bb);
+      Header header = initHeader(hdrbytes);
 
       // decompress if-needed
       final byte[] bodyArray = new byte[response.readableBytes()];
@@ -63,8 +62,7 @@ public class RpcResponseDecoder extends ByteToMessageDecoder {
       /**
        * checksum is always executed on original body.
        */
-      final long checkSum =
-        MAX_UNSIGNED_INT & LongHashFunction.xx().hashBytes(bodyArray);
+      final long checkSum = calculateCheckSum(bodyArray);
 
       if (checkSum != header.checksum()) {
         InvalidChecksumException exception = new InvalidChecksumException(

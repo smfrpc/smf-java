@@ -15,7 +15,7 @@ import smf.client.core.exceptions.SessionIdGenerationException;
  * from multiple threads - the only one restriction is that, it should be issued
  * once per SMF-Client to prevent session collision inside single JVM.
  * Performance : this is separate issue that will be fixed in
- * https://github.com/KowalczykBartek/smf-java/issues/3
+ * https://github.com/smfrpc/smf-java/issues/3
  */
 public class SessionIdGenerator {
   private static final byte MAX_RETRIES = 5;
@@ -62,7 +62,7 @@ public class SessionIdGenerator {
           LOG.debug(
             "SessionID MISS ! "
               +
-              "Other thread generated exact sessionId ( {}) and was faster to assign it",
+              "Other thread generated exact sessionId ({}) and was faster to assign it",
             sessionIdAttempt);
         }
       }
