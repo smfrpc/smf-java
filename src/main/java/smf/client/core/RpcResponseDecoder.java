@@ -3,15 +3,15 @@
 
 package smf.client.core;
 
-import static smf.common.CodingHelper.calculateCheckSum;
-import static smf.common.CodingHelper.initHeader;
+import static smf.common.codingHelper.EncoderUtils.calculateCheckSum;
+import static smf.common.codingHelper.EncoderUtils.initHeader;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.nio.ByteBuffer;
 import java.util.List;
-import net.openhft.hashing.LongHashFunction;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import smf.Header;

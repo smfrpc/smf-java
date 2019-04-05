@@ -3,7 +3,7 @@
 
 package smf.server.core;
 
-import static smf.common.CodingHelper.initHeader;
+import static smf.common.codingHelper.EncoderUtils.initHeader;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

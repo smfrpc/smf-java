@@ -1,7 +1,7 @@
 // Copyright 2019 SMF Authors
 //
 
-package smf.common;
+package smf.common.codingHelper;
 
 import com.google.flatbuffers.FlatBufferBuilder;
 import java.nio.ByteBuffer;
@@ -12,7 +12,8 @@ import smf.Header;
 /*
  * Group all common stuff used in encoding/decoding related to flatbuffers.
  */
-public class CodingHelper {
+public class EncoderUtils
+{
   private final static long MAX_UNSIGNED_INT = (long)(Math.pow(2, 32) - 1);
 
   /**
